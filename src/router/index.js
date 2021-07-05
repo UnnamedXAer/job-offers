@@ -14,9 +14,13 @@ export default new Router({
       component: HomeVue
     },
     {
-      path: '/search',
+      path: '/lookup',
       name: 'Lookup',
       component: LookupVue
+    },
+    {
+      path: '*',
+      redirect: '/'
     }
   ]
 });
