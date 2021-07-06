@@ -1,4 +1,4 @@
-import firebaseAxios from 'axios';
+import firebaseAxios from '../axios/firebase';
 
 export function createDumbOffers() {
   const ofs = [
@@ -14,7 +14,7 @@ Utrzymaniem i rozwojem obecnych integracji.`,
         { tech: 'Vuex', lv: 'advanced' },
         { tech: 'Nuxt', lv: 'advanced' }
       ],
-      requirments: [
+      requirements: [
         'Bardzo dobra znajomość JS ;',
         'Bardzo dobra znajomość: Vue 2.x i 3.x, Vuex;',
         'Znajomość narzędzi: Jest i Cypress;',
@@ -39,11 +39,21 @@ Utrzymaniem i rozwojem obecnych integracji.`,
     {
       title: 'Junior Backend Developer',
       description: '',
-      requirments: [],
-      benefits: [],
+      requirements: [
+        '1+ years of experience in JavaScript and backend development',
+        'excellent knowledge of JS fundamentals (ES6+)',
+        'experience developing REST APIs in Node with Express and/or Hapi',
+        'experience designing and maintaining SQL and NoSQL databases (MySQL, Postgres, MongoDB, Redis)',
+        'experience with Javascript testing tools (unit and integration)',
+        'experience in working with Git',
+        'experience with state management libraries',
+        'familiarity with Node ORM tools (Sequelize, Mongoose)',
+        'ability to write SOLID and DRY code'
+      ],
+      benefits: ['you work at Go0gle !'],
       company: 'Go0gle',
       salary: { start: 7, end: 10 },
-      locations: ['remote', {}]
+      locations: ['remote']
     },
     {
       title: 'Mid/Senior Node Developer',
@@ -56,7 +66,7 @@ Frontkom empowers businesses and impactful organisations to discover and leverag
         { tech: 'Node.js', lv: 'advanced' },
         { tech: 'ReactJS', lv: 'advanced' }
       ],
-      requirments: [
+      requirements: [
         '3+ years of experience in JavaScript and backend development',
         'relevant real world experience with complex projects on Node and React',
         'great command of English - spoken and written',
@@ -83,7 +93,7 @@ Frontkom empowers businesses and impactful organisations to discover and leverag
         { tech: 'SQL', lv: 'advanced' },
         { tech: 'Java', lv: 'regular' }
       ],
-      requirments: [
+      requirements: [
         'minimum 4 years of experience in a similar position',
         'minimum 2 years of experience in Java',
         'very good English skills'
@@ -105,7 +115,7 @@ Liki is a place where amazing people (like you) can learn and do their best work
         { tech: 'Expressjs', lv: 'advanced' },
         { tech: 'ReactJS', lv: 'junior' }
       ],
-      requirments: [
+      requirements: [
         'have 3 years of proven experience in Front-end development',
         'are keen on React, Angular or Vue',
         'know how to use repository based on gitflow',
@@ -145,7 +155,7 @@ Liki is a place where amazing people (like you) can learn and do their best work
         { tech: 'Vuex', lv: 'regular' },
         { tech: 'Nuxt', lv: 'junior' }
       ],
-      requirments: [
+      requirements: [
         'Rok doświadczenia',
         'Bardzo dobra znajomość HTML 5, CSS 3 (SASS), RWD',
         'Dobra znajomość JavaScript (standard ES6+)',
@@ -158,17 +168,20 @@ Liki is a place where amazing people (like you) can learn and do their best work
         'Współpracować z jednym z 3 zespołów odpowiedzialnych za wybrany obszar firmy: Leads, Machine Learning, Editor',
         'Brać udział w cały cyklu życia aplikacji w oparciu o podejście Continuous Deployment'
       ],
-      benefits: [],
+      benefits: ['multisport'],
       company: 'AtomStore',
       salary: { start: 6, end: 14 },
-      locations: ['remote', { name: 'Rzeszów', coords: { lat: 52, lng: 28 } }]
+      locations: ['remote', { name: 'Rzeszów', coords: { lat: 52, lng: 28 } }],
+      appliedAt: new Date(Date.now() - 1000 * 60 * 60 * 24)
     }
   ];
   let today = new Date();
-  ofs.map(offer => {
+  ofs.map((offer, i) => {
     return firebaseAxios.post('/offers.json', {
       ...offer,
-      createdAt: new Date(today.setTime(today.getTime() - 1000 * 60 * 60 * 24))
+      createdAt: new Date(
+        today.setTime(today.getTime() - 1000 * 60 * 60 * 24 + i)
+      )
     });
   });
 

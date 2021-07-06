@@ -21,7 +21,13 @@
     ></app-offers>
 
     <section class="offer" v-if="currentOffer">
-      <app-offer :offer="currentOffer"></app-offer>
+      <app-offer
+        :offer="currentOffer"
+        :disabled-next="offers.length === 0"
+        @next-offer="nextOffer"
+        @offer-seen="markOfferAsSeen"
+        @remove-offer="removeOffer"
+      ></app-offer>
     </section>
   </div>
 </template>
@@ -32,6 +38,8 @@ import FiltersVue from './Filters.vue';
 import OffersVue from './offers/Offers.vue';
 import OfferVue from './offers/Offer.vue';
 import firebaseAxios from '../../axios/firebase';
+
+import { createDumbOffers } from '../../data_dev/offers_data';
 
 export default {
   components: {
@@ -63,6 +71,35 @@ export default {
     },
     setCurrentOffer(id) {
       this.currentOfferIdx = this.offers.findIndex((x) => x.id === id);
+    },
+    nextOffer() {
+      if (this.offers.length === 0) {
+        this.currentOfferIdx = -1;
+        return;
+      }
+      if (this.currentOfferIdx < this.offers.length - 1) {
+        this.currentOfferIdx++;
+        return;
+      }
+      this.currentOfferIdx = 0;
+    },
+    removeOffer(id) {
+      const offerIdx = this.offers.findIndex((x) => x.id === id);
+      if (offerIdx === -1) {
+        return;
+      }
+
+      this.offers.splice(offerIdx, 1);
+
+      if (this.currentOfferIdx >= this.offers.length) {
+        this.currentOfferIdx = this.offers.length - 1;
+      }
+    },
+    markOfferAsSeen(id) {
+      const idx = this.offers.findIndex((x) => x.id === id);
+      if (idx !== -1) {
+        this.offers[idx].seenAt = new Date();
+      }
     }
   },
   created() {
@@ -75,11 +112,16 @@ export default {
         for (const id in data) {
           offers.push({
             ...data[id],
-            id
+            id,
+            seenAt: data[id].seenAt || null
           });
         }
         this.offers = offers;
         this.currentOfferIdx = offers.length - 1;
+
+        if (offers.length === 0 && process.env.NODE_ENV !== 'production') {
+          createDumbOffers();
+        }
       })
       .catch((err) => {
         console.log('fetch offers: error:', err);
