@@ -4,9 +4,6 @@
       <app-navbar></app-navbar>
     </div>
     <div class="row">
-      <nav class="nav navbar"></nav>
-    </div>
-    <div class="row">
       <router-view />
     </div>
   </div>

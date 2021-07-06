@@ -9,14 +9,14 @@ export default new Router({
   mode: 'history',
   routes: [
     {
-      path: '/',
-      name: 'Home',
-      component: HomeVue
-    },
-    {
       path: '/lookup',
       name: 'Lookup',
       component: LookupVue
+    },
+    {
+      path: '/',
+      name: 'Home',
+      component: HomeVue
     },
     {
       path: '*',

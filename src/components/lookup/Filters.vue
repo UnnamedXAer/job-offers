@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div class="row card card-body">
     <div class="row align-items-center">
       <div class="col-lg-2">
         <h2 style="width: 100%; text-align: end">Search</h2>
@@ -29,12 +29,31 @@
       </div>
       <div class="col-lg-2">
         <button
-          class="btn btn-outline-success"
+          class="btn btn-outline-success btn-lg"
           type="button"
           style="width: 100%"
         >
           🔎 Search
         </button>
+      </div>
+    </div>
+    <div class="row align-items-center">
+      <div class="collapse multi-collapse gy-2">
+        <div class="col-lg-4">
+          <input
+            class="form-control"
+            id="offer-age"
+            type="number"
+            min="1"
+            max="30"
+            placeholder="From last days"
+            style="width: 100%"
+          />
+        </div>
+        <div class="col-lg-4">
+          <label class="form-check-label" for="remote">Include Remote:</label>
+          <input class="form-check-input" id="remote" type="checkbox" />
+        </div>
       </div>
     </div>
   </div>

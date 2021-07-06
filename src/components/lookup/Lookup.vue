@@ -1,6 +1,6 @@
 <template>
   <div class="container-lg">
-    <app-filters></app-filters>
+    <app-filter></app-filter>
   </div>
 </template>
 
@@ -8,7 +8,7 @@
 import FiltersVue from './Filters.vue';
 export default {
   components: {
-    appFilters: FiltersVue,
+    appFilter: FiltersVue,
   },
 };
 </script>

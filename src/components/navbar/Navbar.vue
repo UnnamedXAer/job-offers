@@ -1,10 +1,7 @@
 <template>
-  <nav
-    class="navbar navbar-expand-lg navbar-light"
-    style="background-color: #e3f2fd"
-  >
+  <nav class="navbar navbar-expand-md navbar-light shadow-sm p-3 mb-5 __navbar rounded-bottom">
     <div class="container-fluid">
-      <router-link class="navbar-brand" to="/">💸</router-link>
+      <router-link class="navbar-brand fs-2" to="/">💸</router-link>
       <button
         class="navbar-toggler"
         type="button"
@@ -17,22 +14,20 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNavDropdown">
-        <ul class="navbar-nav">
-          <router-link to="/" active-class="active" class="nav-item" custom >
-            <a class="nav-link">Home</a>
+        <div class="navbar-nav">
+          <router-link to="/" active-class="active" class="nav-link fs-3 fw-bold" exact>
+            Home
           </router-link>
-          <router-link to="/lookup" active-class="active" class="nav-item">
-            <a class="nav-link">Lookup</a>
+          <router-link to="/lookup" active-class="active" class="nav-link fs-3 fw-bold">
+            Lookup
           </router-link>
-
-          <!-- <li class="nav-item">
-            <a class="nav-link"  href="/">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/lookup">Lookup</a>
-          </li> -->
-        </ul>
+        </div>
       </div>
     </div>
   </nav>
 </template>
+<style scoped>
+.__navbar {
+  background-color: #c0e2fa;
+}
+</style>
