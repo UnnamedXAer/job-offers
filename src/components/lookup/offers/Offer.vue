@@ -1,24 +1,29 @@
 <template>
   <div class="d-flex flex-column mb-5 __offer">
     <section class="p-lg-5 p-sm-3 p-1">
-      <h4 class="p-lg-4" role="h1" style="padding-top: 0 !important">
+      <h4 class="px-lg-4" role="h1" style="padding-top: 0 !important">
         {{ offer.title }}
       </h4>
-      <div class="d-flex">
+      <div class="__offer-details">
         <div>
-          <code v-if="offer.salary"
-            >$ {{ offer.salary.start * 1000 }} -
-            {{ offer.salary.end * 1000 }}</code
-          >
+          <small>{{ offer.company }}</small>
+        </div>
+        <div class="d-flex justify-content-between">
           <div>
             <div
-              class="badge bg-primary m-1"
+              class="badge bg-success m-1"
+              :class="{ 'bg-warning': typeof loc === 'string' }"
               v-for="(loc, idx) in offer.locations"
               :key="idx"
             >
               {{ typeof loc === 'string' ? loc : loc.name }}
+              <i class="bi bi-geo-alt" v-if="typeof loc === 'object'"></i>
             </div>
           </div>
+          <code v-if="offer.salary"
+            >$ {{ offer.salary.start * 1000 }} -
+            {{ offer.salary.end * 1000 }}</code
+          >
         </div>
       </div>
       <article class="mb-3">
@@ -102,7 +107,7 @@
           :disabled="disabledNext || rejecting || applying"
           @click="nextOffer"
         >
-          Next
+          Later
         </button>
         <button
           class="btn btn-primary btn-lg mx-3"
@@ -231,6 +236,10 @@ export default {
 </script>
 
 <style scoped>
+.__offer-details {
+  min-height: 4rem;
+}
+
 .__list {
   padding-left: 0.5rem;
 }
