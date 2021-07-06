@@ -9,7 +9,10 @@
         @click="hide"
       ></button>
     </div>
-    <div class="mt-3 d-flex flex-row __offers" role="link">
+    <div
+      class="mt-3 d-flex __offers"
+      role="link"
+    >
       <div
         v-for="(offer, idx) in offers"
         :key="offer.id"
@@ -62,10 +65,10 @@ export default {
 }
 
 .__offer {
-  min-width: 150px;
-  max-width: 250px;
+  width: 160px !important;
   max-height: 100%;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .__offer:hover,
