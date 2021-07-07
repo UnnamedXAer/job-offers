@@ -37,9 +37,9 @@ import ErrorVue from '../ui/alerts/Error.vue';
 import FiltersVue from './Filters.vue';
 import OffersVue from './offers/Offers.vue';
 import OfferVue from './offers/Offer.vue';
-import firebaseAxios from '../../axios/firebase';
+// import firebaseAxios from '../../axios/firebase';
 
-import { createDumbOffers } from '../../data_dev/offers_data';
+// import { createDumbOffers } from '../../data_dev/offers_data';
 
 export default {
   components: {
@@ -103,33 +103,35 @@ export default {
     }
   },
   created() {
-    this.error = null;
-    this.loading = true;
-    firebaseAxios
-      .get('/offers.json')
-      .then(({ data }) => {
-        const offers = [];
-        for (const id in data) {
-          offers.push({
-            ...data[id],
-            id,
-            seenAt: data[id].seenAt || null
-          });
-        }
-        this.offers = offers;
-        this.currentOfferIdx = offers.length - 1;
+    this.loading = false;
 
-        if (offers.length === 0 && process.env.NODE_ENV !== 'production') {
-          createDumbOffers();
-        }
-      })
-      .catch((err) => {
-        console.log('fetch offers: error:', err);
-        this.error = err;
-      })
-      .finally(() => {
-        this.loading = false;
-      });
+    // this.error = null;
+    // this.loading = true;
+    // firebaseAxios
+    //   .get('/offers.json')
+    //   .then(({ data }) => {
+    //     const offers = [];
+    //     for (const id in data) {
+    //       offers.push({
+    //         ...data[id],
+    //         id,
+    //         seenAt: data[id].seenAt || null
+    //       });
+    //     }
+    //     this.offers = offers;
+    //     this.currentOfferIdx = offers.length - 1;
+
+    //     if (offers.length === 0 && process.env.NODE_ENV !== 'production') {
+    //       createDumbOffers();
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     console.log('fetch offers: error:', err);
+    //     this.error = err;
+    //   })
+    //   .finally(() => {
+    //     this.loading = false;
+    //   });
   }
 };
 </script>
