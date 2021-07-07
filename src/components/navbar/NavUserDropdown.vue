@@ -9,7 +9,7 @@
       :aria-expanded="expanded"
       @click.stop="toggleUserMenu"
     >
-      User
+      More
     </a>
     <transition name="__fade-scale">
       <div
