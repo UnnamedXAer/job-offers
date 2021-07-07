@@ -54,7 +54,8 @@ export default {
   },
   data() {
     return {
-      expanded: false
+      expanded: false,
+      canToggleExpand: false
     };
   },
   watch: {
@@ -67,15 +68,30 @@ export default {
   },
   methods: {
     toggleMenu() {
-      console.log('toogle to: ', !this.expanded);
-      this.expanded = !this.expanded;
+      if (this.canToggleExpand) {
+        this.expanded = !this.expanded;
+      }
     },
     closeMenu(ev) {
-      console.log('close menu', ev.target);
       if (!this.$el.contains(ev.target)) {
         this.expanded = false;
       }
     }
+  },
+  created() {
+    this.mqList = window.matchMedia('(min-width: 768px)');
+    this.expanded = this.mqList.matches;
+    this.canToggleExpand = !this.mqList.matches;
+    this.mqEvHandler = (ev) => {
+      console.log(ev);
+      console.log(this);
+      this.expanded = ev.matches;
+      this.canToggleExpand = !ev.matches;
+    };
+    this.mqList.addEventListener('change', this.mqEvHandler);
+  },
+  destroyed() {
+    this.mqList.removeEventListener('change', this.mqEvHandler);
   }
 };
 </script>
