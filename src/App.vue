@@ -1,10 +1,11 @@
 <template>
-  <div class="container-lg">
-    <div class="row">
-      <app-navbar></app-navbar>
-    </div>
-    <div class="row">
-      <router-view />
+  <div>
+    <app-navbar></app-navbar>
+    <div class="container-lg">
+      <div class="row"></div>
+      <div class="row">
+        <router-view />
+      </div>
     </div>
   </div>
 </template>
