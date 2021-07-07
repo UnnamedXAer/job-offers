@@ -1,6 +1,6 @@
 <template>
-  <div class="row card card-body" style="background-color: inherit">
-    <div class="row align-items-center">
+  <div class="row card card-body align-items-center px-0 mx-sm-1 mx-lg-0" style="background-color: inherit">
+    <div class="row align-items-center px-0">
       <div class="col-lg-2">
         <h2 style="width: 100%; text-align: end">Search</h2>
       </div>

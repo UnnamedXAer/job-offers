@@ -1,5 +1,5 @@
 <template>
-  <div class="container-lg">
+  <div>
     <app-filter></app-filter>
     <div class="row mt-3">
       <div
