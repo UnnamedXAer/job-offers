@@ -59,11 +59,9 @@ export default {
   },
   methods: {
     toggleUserMenu() {
-      console.log('user --- toogle to: ', !this.expanded);
       this.expanded = !this.expanded;
     },
     closeMenu(ev) {
-      console.log('user --- close user menu', ev.target);
       if (!this.$el.contains(ev.target)) {
         this.expanded = false;
       }
