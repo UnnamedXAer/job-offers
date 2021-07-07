@@ -149,7 +149,7 @@ export default {
     return {
       applying: false,
       rejecting: false,
-      error: 'Cound not reject, plase try again later'
+      error: null
     };
   },
   watch: {
