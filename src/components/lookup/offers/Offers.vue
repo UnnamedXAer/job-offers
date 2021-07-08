@@ -10,7 +10,7 @@
       ></button>
     </div>
     <div
-      class="mt-3 d-flex __offers"
+      class="mt-3 d-flex justify-content-center __offers"
       role="link"
     >
       <div
