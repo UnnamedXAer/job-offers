@@ -15,6 +15,7 @@
             required
             aria-placeholder="select company"
             v-model="form.company"
+            aria-describedby="offer-title-help-block"
           >
             <option selected disabled value="">
               Pick company for the offer
@@ -28,7 +29,7 @@
             </option>
           </select>
           <div id="offer-company-help-block" class="form-text text-danger">
-            {{ errors.title }}
+            {{ errors.company }}
           </div>
           <hr />
         </div>
@@ -45,6 +46,7 @@
             required
             autocomplete="off"
             v-model="form.title"
+            aria-describedby="offer-title-help-block"
           />
           <div id="offer-title-help-block" class="form-text text-danger">
             {{ errors.title }}
@@ -61,6 +63,7 @@
             id="offer-description"
             rows="3"
             v-model="form.description"
+            aria-describedby="offer-description-help-block"
           ></textarea>
           <div id="offer-description-help-block" class="form-text text-danger">
             {{ errors.description }}
@@ -82,6 +85,7 @@
                 placeholder="Node.js, Oracle, ect."
                 required
                 v-model="form.stack.name"
+                aria-describedby="offer-stack-help-block"
               />
               <input
                 type="text"
@@ -101,6 +105,9 @@
               </button>
             </div>
           </form>
+          <div id="offer-stack-help-block" class="form-text text-danger">
+            {{ errors.stack }}
+          </div>
           <datalist id="offer-stack-name-datalist">
             <option
               v-for="opt in datalists.offerStackName"
@@ -141,7 +148,11 @@
             @add-to-list="addListElement"
             required
             autocomplete="off"
+            aria-describedby="offer-requirements-help-block"
           ></app-new-offer-input-list>
+          <div id="offer-requirements-help-block" class="form-text text-danger">
+            {{ errors.requirements }}
+          </div>
 
           <app-offer-prop-list
             icon="bookmark-check"
@@ -163,7 +174,11 @@
             @add-to-list="addListElement"
             required
             autocomplete="off"
+            aria-describedby="offer-tasks-help-block"
           ></app-new-offer-input-list>
+          <div id="offer-tasks-help-block" class="form-text text-danger">
+            {{ errors.tasks }}
+          </div>
 
           <app-offer-prop-list
             icon="screwdriver"
@@ -185,7 +200,11 @@
             @add-to-list="addListElement"
             required
             autocomplete="off"
+            aria-describedby="offer-benefits-help-block"
           ></app-new-offer-input-list>
+          <div id="offer-benefits-help-block" class="form-text text-danger">
+            {{ errors.benefits }}
+          </div>
 
           <app-offer-prop-list
             icon="gift"
@@ -208,6 +227,7 @@
               class="form-control"
               placeholder="London, Warsaw, remote"
               v-model="form.location"
+              aria-describedby="offer-locations-help-block"
             />
             <button
               class="btn btn-outline-secondary"
@@ -225,7 +245,9 @@
               <i class="bi bi-plus"></i>
             </button>
           </div>
-
+          <div id="offer-locations-help-block" class="form-text text-danger">
+            {{ errors.locations }}
+          </div>
           <div
             class="mt-2 d-flex border border-info rounded p-2"
             v-if="form.locationsList.length"
@@ -243,6 +265,39 @@
           <hr />
         </div>
 
+        <div class="mb-2">
+          <label for="offer-slalary-start" class="form-label fw-bold"
+            >Salary range</label
+          >
+          <div class="input-group" style="flex-wrap: unset">
+            <span class="input-group-text">$ [k]</span>
+            <span class="input-group-text">from</span>
+            <input
+              type="number"
+              class="form-control"
+              id="offer-slalary-start"
+              placeholder="min salary: 5, 8.5, 12.8 - number in thousands"
+              required
+              v-model="form.salary.start"
+              aria-labelledby="offer-slalary-start"
+              aria-describedby="offer-salary-help-block"
+            />
+            <span class="input-group-text">to</span>
+            <input
+              type="number"
+              class="form-control"
+              id="offer-slalary-end"
+              required
+              placeholder="max salary: 8, 12.8, 25 - number in thousands"
+              v-model="form.salary.end"
+              aria-labelledby="offer-slalary-name"
+              aria-describedby="offer-salary-help-block"
+            />
+          </div>
+          <div id="offer-salary-help-block" class="form-text text-danger">
+            {{ errors.salary }}
+          </div>
+        </div>
 
         <div class="d-flex justify-content-evenly mt-5">
           <button
@@ -307,34 +362,36 @@ export default {
         }
       ],
       form: {
-        company: '',
-        title: '',
-        description: '',
-        stack: { name: '', lv: '' },
+        company: 'xcvf234245gy2442g425',
+        title: 'Vue Frontend Dev',
+        description:
+          'Top ten tech company in Africa is looking for top Vue developers.',
+        stack: { name: 'MongoDB', lv: 'junior' },
         stackList: [{ name: 'node.js', lv: 'junior' }],
-        requirement: '',
+        requirement: 'integration with REST service',
         requirementsList: [
           '5 years of exp in node.js',
           'good knowledge of React.js'
         ],
-        task: '',
+        task: 'code review',
         tasksList: ['fixing bugs', 'updating docs', 'making me coffe'],
-        benefit: '',
+        benefit: 'Coffe & tea',
         benefitsList: ['multisport', 'multi steps', 'private helth insurance'],
         salary: { start: '6.5', end: '12' },
-        location: '',
+        location: 'here',
         locationsList: ['remote', { name: 'Warsaw' }]
       },
       errors: {
-        company: '',
-        title: '',
-        description: '',
-        stack: '',
-        requirements: '',
-        tasks: '',
-        benefits: '',
-        salary: '',
-        location: ''
+        company: 'Please select for witch of your companies is this offer.',
+        title: 'Please specify the offer title.',
+        description: 'Description cannot exceed 5k chars.',
+        stack: 'Too many positions, please reduce to 10.',
+        requirements: 'Too many positions, please reduce to 10.',
+        tasks: 'Too many positions, please reduce to 10.',
+        benefits: 'Too many positions, please reduce to 20.',
+        salary:
+          'Incorrect value. Enter salary as monthly payment divided by one thousand.',
+        locations: 'Too many positions, please reduce to 20.'
       }
     };
   },
@@ -481,36 +538,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-.__list {
-  padding-left: 0.5rem;
-}
-.__list li {
-  list-style-type: none;
-  position: relative;
-}
-
-.__list li:hover {
-  cursor: pointer;
-  background: var(--bs-light);
-}
-
-.__remove_icon {
-  display: none;
-}
-
-.__list li:hover .__remove_icon {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 1rem;
-}
-
-.__list li i {
-  margin-right: 1rem;
-}
-</style>
