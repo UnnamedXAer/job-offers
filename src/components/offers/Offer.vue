@@ -5,7 +5,7 @@
     </h4>
     <div class="__offer-details">
       <div>
-        <small>{{ offer.company }}</small>
+        <small>{{ offer.company.name }}</small>
       </div>
       <div class="d-flex justify-content-between">
         <div>
@@ -25,6 +25,7 @@
         >
       </div>
     </div>
+    <hr />
     <article class="mb-3">
       <p>{{ offer.description }}</p>
     </article>
@@ -34,9 +35,9 @@
         <div
           class="badge bg-primary m-1"
           v-for="tech in offer.stack"
-          :key="tech.tech"
+          :key="tech.name"
         >
-          {{ tech.tech }}
+          {{ tech.name }}
           <small style="color: #ccc; font-size: 0.8em">{{ tech.lv }}</small>
         </div>
       </div>

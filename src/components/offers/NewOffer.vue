@@ -298,7 +298,7 @@ export default {
         tasksList: ['fixing bugs', 'updating docs', 'making me coffe'],
         benefit: '',
         benefitsList: ['multisport', 'multi steps', 'private helth insurance'],
-        salary: '',
+        salary: { start: '6.5', end: '12' },
         location: '',
         locationsList: ['remote', { name: 'Warsaw' }]
       },
@@ -322,7 +322,39 @@ export default {
         t.cb();
       });
       this.timeouts = [];
-      this.$router.replace('user/offers/')
+      this.$router.replace('/user/offers/');
+    },
+    showOfferPreview() {
+      let missingRequiredField = ['title', 'company'].some(
+        (x) => this.form[x].length === 0
+      );
+
+      const salary = {
+        start: parseFloat(this.form.salary.start),
+        end: parseFloat(this.form.salary.end)
+      };
+
+      missingRequiredField =
+        missingRequiredField || salary.start <= 0 || salary.end <= 0;
+
+      if (missingRequiredField) {
+        alert('Fill at least title, salary and compny fields');
+        return;
+      }
+
+      const offer = {
+        company: this.userCompanies.find((x) => x.id === this.form.company),
+        benefits: this.form.benefitsList,
+        tasks: this.form.tasksList,
+        locations: this.form.locationsList,
+        requirements: this.form.requirementsList,
+        stack: this.form.stackList,
+        description: this.form.description,
+        title: this.form.title,
+        salary: salary
+      };
+
+      this.$router.push({ name: 'NewOfferPreview', params: { offer } });
     },
     removeElement(formFieldName, idx) {
       this.$delete(this.form[formFieldName], idx);
@@ -393,6 +425,10 @@ export default {
     this.timeouts.forEach((t) => clearTimeout(t.id));
   },
   beforeRouteLeave(to, from, next) {
+    if (to.path.endsWith('offers/new/preview')) {
+      return next(true);
+    }
+
     let modified = [
       'company',
       'title',

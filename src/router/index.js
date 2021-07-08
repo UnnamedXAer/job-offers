@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import HomeVue from '@/components/Home';
 import LookupVue from '@/components/lookup/Lookup.vue';
 import NewOfferVue from '@/components/offers/NewOffer.vue';
+import NewOfferPreviewVue from '@/components/offers/NewOfferPreviewVue.vue';
 
 Vue.use(Router);
 
@@ -16,8 +17,14 @@ export default new Router({
     },
     {
       path: '/offers/new',
-      name: 'Create Offer',
+      name: 'CreateOffer',
       component: NewOfferVue
+    },
+    {
+      path: '/offers/new/preview',
+      name: 'NewOfferPreview',
+      component: NewOfferPreviewVue,
+      props: true
     },
     {
       path: '/',
