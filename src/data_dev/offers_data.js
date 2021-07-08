@@ -1,5 +1,5 @@
 import firebaseAxios from '../axios/firebase';
-
+let c = 0;
 export function createDumbOffers() {
   const ofs = [
     {
@@ -9,10 +9,10 @@ Budowaniem systemu płatności online, który pozwala użytkownikom Booksy w Eur
 Wdrażaniem nowych integracji płatności;
 Utrzymaniem i rozwojem obecnych integracji.`,
       stack: [
-        { tech: 'JavaScript', lv: 'advanced' },
-        { tech: 'Vue', lv: 'advanced' },
-        { tech: 'Vuex', lv: 'advanced' },
-        { tech: 'Nuxt', lv: 'advanced' }
+        { name: 'JavaScript', lv: 'advanced' },
+        { name: 'Vue', lv: 'advanced' },
+        { name: 'Vuex', lv: 'advanced' },
+        { name: 'Nuxt', lv: 'advanced' }
       ],
       requirements: [
         'Bardzo dobra znajomość JS ;',
@@ -32,7 +32,7 @@ Utrzymaniem i rozwojem obecnych integracji.`,
         'system kafereryjny',
         'dofinansowanie do nauki języka angielskiego'
       ],
-      company: 'Go0gle',
+      company: { id: 'id_' + ++c, name: 'Go0gle' },
       salary: { start: 7, end: 10 },
       locations: ['remote', { name: 'Warszawa' }]
     },
@@ -51,7 +51,7 @@ Utrzymaniem i rozwojem obecnych integracji.`,
         'ability to write SOLID and DRY code'
       ],
       benefits: ['you work at Go0gle !'],
-      company: 'Go0gle',
+      company: { id: 'id_' + ++c, name: 'Go0gle' },
       salary: { start: 7, end: 10 },
       locations: ['remote']
     },
@@ -62,9 +62,9 @@ Join us remotely or in our Warsaw or Lublin office to deliver innovative digital
 
 Frontkom empowers businesses and impactful organisations to discover and leverage digital opportunities. We help people adopt technology for growth, innovation and positive world impacts. We’re a team of over 70 specialists - designers, developers and business consultants working in a collaborative, international environment from offices in Lublin, Warsaw, Oslo, Fredrikstad, Funchal and Berlin. We support the free and open web and love to invest in open source projects.`,
       stack: [
-        { tech: 'JavaScript', lv: 'advanced' },
-        { tech: 'Node.js', lv: 'advanced' },
-        { tech: 'ReactJS', lv: 'advanced' }
+        { name: 'JavaScript', lv: 'advanced' },
+        { name: 'Node.js', lv: 'advanced' },
+        { name: 'ReactJS', lv: 'advanced' }
       ],
       requirements: [
         '3+ years of experience in JavaScript and backend development',
@@ -81,7 +81,7 @@ Frontkom empowers businesses and impactful organisations to discover and leverag
         'ability to write SOLID and DRY code'
       ],
       benefits: [],
-      company: 'Sii',
+      company: { id: 'id_' + ++c, name: 'Sii' },
       salary: { start: 10, end: 18 },
       locations: ['remote', { name: 'Bagno' }, { name: 'Warszawa' }]
     },
@@ -89,9 +89,9 @@ Frontkom empowers businesses and impactful organisations to discover and leverag
       title: 'Senior Oracle Developer',
       description: `ITFS is a consulting company from the Tri-City area, with a branch in Warsaw. We are primarily engaged in recruiting IT specialists and creating project-based Software houses for our Clients from Poland and Western Europe.`,
       stack: [
-        { tech: 'Oracle APEX', lv: 'advanced' },
-        { tech: 'SQL', lv: 'advanced' },
-        { tech: 'Java', lv: 'regular' }
+        { name: 'Oracle APEX', lv: 'advanced' },
+        { name: 'SQL', lv: 'advanced' },
+        { name: 'Java', lv: 'regular' }
       ],
       requirements: [
         'minimum 4 years of experience in a similar position',
@@ -99,7 +99,7 @@ Frontkom empowers businesses and impactful organisations to discover and leverag
         'very good English skills'
       ],
       benefits: ['private medical care', 'Multisport'],
-      company: 'Sii',
+      company: { id: 'id_' + ++c, name: 'Sii' },
       salary: { start: 12, end: 24 },
       locations: [{ name: 'Centrum, Warszawa' }]
     },
@@ -110,10 +110,10 @@ Frontkom empowers businesses and impactful organisations to discover and leverag
 
 Liki is a place where amazing people (like you) can learn and do their best work. We are growing rapidly and always looking for new tech talents to welcome onboard. Are you the one? Join the crew and become our next Frontend Developer.`,
       stack: [
-        { tech: 'JavaScript', lv: 'advanced' },
-        { tech: 'Node.js', lv: 'advanced' },
-        { tech: 'Expressjs', lv: 'advanced' },
-        { tech: 'ReactJS', lv: 'junior' }
+        { name: 'JavaScript', lv: 'advanced' },
+        { name: 'Node.js', lv: 'advanced' },
+        { name: 'Expressjs', lv: 'advanced' },
+        { name: 'ReactJS', lv: 'junior' }
       ],
       requirements: [
         'have 3 years of proven experience in Front-end development',
@@ -134,7 +134,7 @@ Liki is a place where amazing people (like you) can learn and do their best work
         'lots of room for growth! '
       ],
       tasks: [],
-      company: 'MasterBorn',
+      company: { id: 'id_' + ++c, name: 'MasterBorn' },
       salary: { start: 6, end: 14 },
       locations: [
         'remote',
@@ -150,10 +150,10 @@ Liki is a place where amazing people (like you) can learn and do their best work
       description:
         'Jesteśmy młodym software housem założonym przez doświadczonych specjalistów w dziedzinie IT. W naszej firmie łączymy sprawdzone technologie ze świeżymi koncepcjami. Pracujemy w małych zespołach, co pozwala na częsty kontakt i przepływ wiedzy ze strony bardziej doświadczonych osób. Zapewniamy elastyczność w doborze godzin oraz miejsca pracy – możesz pracować zdalnie i/lub w biurze, w ścisłym centrum Lublina. ',
       stack: [
-        { tech: 'JavaScript', lv: 'regular' },
-        { tech: 'Vue', lv: 'regular' },
-        { tech: 'Vuex', lv: 'regular' },
-        { tech: 'Nuxt', lv: 'junior' }
+        { name: 'JavaScript', lv: 'regular' },
+        { name: 'Vue', lv: 'regular' },
+        { name: 'Vuex', lv: 'regular' },
+        { name: 'Nuxt', lv: 'junior' }
       ],
       requirements: [
         'Rok doświadczenia',
@@ -169,7 +169,7 @@ Liki is a place where amazing people (like you) can learn and do their best work
         'Brać udział w cały cyklu życia aplikacji w oparciu o podejście Continuous Deployment'
       ],
       benefits: ['multisport'],
-      company: 'AtomStore',
+      company: { id: 'id_' + ++c, name: 'AtomStore' },
       salary: { start: 6, end: 14 },
       locations: ['remote', { name: 'Rzeszów', coords: { lat: 52, lng: 28 } }],
       appliedAt: new Date(Date.now() - 1000 * 60 * 60 * 24)
