@@ -5,7 +5,6 @@
     </div>
     <div class="row justify-content-center">
       <div class="col-12" style="max-width: 960px">
-        <!-- <form @submit.prevent="submitHandler" autocomplete="off"> -->
         <div class="mb-3">
           <label class="form-label fw-bold" for="offer-company"
             >Select Company</label
@@ -244,10 +243,33 @@
           <hr />
         </div>
 
-        <button class="btn btn-primary" type="button" @click="submitHandler">
-          Create
-        </button>
-        <!-- </form> -->
+
+        <div class="d-flex justify-content-evenly mt-5">
+          <button
+            class="btn btn-outline-info btn-lg"
+            :class="{ disabled: loading }"
+            :disabled="loading"
+            type="button"
+            @click="showOfferPreview"
+          >
+            Show Preview
+          </button>
+          <button
+            class="btn btn-primary btn-lg"
+            :class="{ disabled: loading }"
+            :disabled="loading"
+            type="button"
+            @click="submitHandler"
+          >
+            <span
+              class="spinner-border spinner-border-sm"
+              role="status"
+              v-if="loading"
+            ></span>
+            Post Offer
+            <span class="visually-hidden" v-if="loading">Loading...</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -263,6 +285,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       datalists: {
         offerStackLv: [
           'junior',
