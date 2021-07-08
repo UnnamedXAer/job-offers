@@ -1,13 +1,15 @@
 <template>
-  <section v-if="items.length">
-    <ul class="__list">
+  <section class="mt-2">
+    <transition-group name="__fade-slide" mode="out-in" tag="ul" class="__list">
       <li
+        class="my-1 py-1 rounded"
         v-for="(item, idx) in items"
         :key="item"
+        :data-custom-key="item"
         @click="onClick && onClick(dataFieldName, idx)"
       >
         <i
-          class="bi bi-asterisk"
+          class="bi bi-asterisk ms-2 me-3"
           style="font-size: 0.8em"
           :style="{ color: iconColor }"
           :class="['bi-' + icon]"
@@ -17,7 +19,7 @@
           <i class="bi bi-x" style="font-size: 0.9em"></i
         ></span>
       </li>
-    </ul>
+    </transition-group>
   </section>
 </template>
 
@@ -64,7 +66,21 @@ export default {
   width: 1rem;
 }
 
-.__list li i {
-  margin-right: 1rem;
+/* * transition-group * */
+
+.__fade-slide-enter {
+  opacity: 0;
+  transform: translateX(-40px);
+}
+
+.__fade-slide-enter-active,
+.__fade-slide-leave-active {
+  transition: opacity 300ms, transform 300ms, background-color 300ms;
+}
+
+.__fade-slide-leave-to {
+  opacity: 0;
+  transform: translateX(40px);
+  background-color: var(--bs-danger) !important;
 }
 </style>
