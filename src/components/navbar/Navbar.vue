@@ -83,8 +83,6 @@ export default {
     this.expanded = this.mqList.matches;
     this.canToggleExpand = !this.mqList.matches;
     this.mqEvHandler = (ev) => {
-      console.log(ev);
-      console.log(this);
       this.expanded = ev.matches;
       this.canToggleExpand = !ev.matches;
     };
