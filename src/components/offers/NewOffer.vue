@@ -374,6 +374,7 @@
 import OfferPropListVue from '../ui/offer-prop-list/OfferPropList.vue';
 import NewOfferInputListVue from './NewOfferInputList.vue';
 import * as validator from '../../validation/newOfferValidator.js';
+import { setTouchedAll, checkNullAll } from '../../helpers';
 
 export default {
   components: {
@@ -648,6 +649,18 @@ export default {
         return;
       }
       list.push(item);
+    },
+    validateForm() {
+      setTouchedAll(this.touched);
+      this.checkCompany(this.form.company);
+      this.checkTitle(this.form.title);
+      this.checkDescription(this.form.description);
+      this.errors.stack = validator.list(this.form.stackList, 15);
+      this.errors.requirements = validator.list(this.form.requirementsList, 15);
+      this.errors.tasks = validator.list(this.form.tasksList, 15);
+      this.errors.benefits = validator.list(this.form.benefitsList, 20);
+      this.errors.locations = validator.list(this.form.locationsList, 20);
+      this.checkSalary(this.form.salary.start, this.form.salary.end);
     }
   },
   created() {
@@ -657,6 +670,13 @@ export default {
     this.timeouts.forEach((t) => clearTimeout(t.id));
   },
   beforeRouteLeave(to, from, next) {
+    this.validateForm();
+    const anyError = checkNullAll(this.errors);
+    if (!anyError) {
+      alert('There are an errors in form, please correct them.');
+      return next(false);
+    }
+
     if (to.path.endsWith('offers/new/preview')) {
       return next(true);
     }

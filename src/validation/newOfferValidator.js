@@ -35,6 +35,8 @@ export const title = val => {
   if (len > 150) {
     return getError('e1100', [150]);
   }
+
+  return null;
 };
 
 export const description = val =>
@@ -42,31 +44,6 @@ export const description = val =>
 
 export const list = (val, maxLen) =>
   val.length > maxLen ? getError('e1101', [maxLen]) : null;
-
-export const salaryStart = val => {
-  console.log('val: salary start: ', val);
-  if (val === '') {
-    return getError('e1000');
-  }
-
-  const start = Number(val);
-
-  if (start < 1) {
-    return getError('e1202', ['salary', '1k']) + '😒';
-  }
-};
-
-export const salaryEnd = (start, end) => {
-  if (!start && !end) {
-    return getError('e1000');
-  }
-
-  start = Number(start);
-  end = Number(end);
-  if (end < start) {
-    return getError('e1201', ['Salary', start]);
-  }
-};
 
 export const salary = (start, end, touched) => {
   const errors = { start: null, end: null };
