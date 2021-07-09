@@ -23,3 +23,19 @@ export const checkNullAll = obj => {
   }
   return true;
 };
+
+export const setDataToVueDataProp = (vueDataProp, data) => {
+  for (const prop in data) {
+    if (Array.isArray(data[prop])) {
+      vueDataProp[prop].push(...data[prop]);
+      continue;
+    }
+
+    if (typeof data[prop] === 'object') {
+      setDataToVueDataProp(vueDataProp[prop], data[prop]);
+      continue;
+    }
+
+    vueDataProp[prop] = data[prop];
+  }
+};

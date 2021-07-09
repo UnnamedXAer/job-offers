@@ -1,5 +1,42 @@
 <template>
   <div class="mb-5">
+    <div class="row gx-0" v-if="recoveredForm">
+      <div class="card text-dark border-warning mb-3">
+        <div class="card-header bg-warning">
+          <h5 class="card-title">Recovered form</h5>
+        </div>
+        <div class="card-body">
+          <p class="card-text">
+            We have recovered previous unsaved form from:
+            <time>{{ new Date(recoveredForm.date).toLocaleString() }}.</time>
+          </p>
+          <p>Whould you like to restre it?</p>
+          <div
+            class="
+              card-footer
+              bg-transparent
+              border-success
+              d-flex
+              align-items-center
+              justify-content-around justify-content-sm-end
+            "
+          >
+            <a
+              href="#"
+              @click="deleteUnsavedForm"
+              class="alert-link text-secondary"
+              >Dismiss</a
+            >
+            <button
+              class="btn btn-outline-success mx-sm-5"
+              @click="recoverUnsavedForm"
+            >
+              Recover
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="row">
       <h1>Create a job offer</h1>
     </div>
@@ -374,7 +411,11 @@
 import OfferPropListVue from '../ui/offer-prop-list/OfferPropList.vue';
 import NewOfferInputListVue from './NewOfferInputList.vue';
 import * as validator from '../../validation/newOfferValidator.js';
-import { setTouchedAll, checkNullAll } from '../../helpers';
+import {
+  setTouchedAll,
+  checkNullAll,
+  setDataToVueDataProp
+} from '../../helpers';
 
 export default {
   components: {
@@ -383,6 +424,8 @@ export default {
   },
   data() {
     return {
+      userId: 'my-user-id',
+      recoveredForm: null,
       loading: false,
       datalists: {
         offerStackLv: [
@@ -407,22 +450,18 @@ export default {
       form: {
         company: '',
         title: '',
-        description:
-          'Top ten tech company in Africa is looking for top Vue developers.',
-        stack: { name: 'MongoDB', lv: 'junior' },
-        stackList: [{ name: 'node.js', lv: 'junior' }],
-        requirement: 'integration with REST service',
-        requirementsList: [
-          '5 years of exp in node.js',
-          'good knowledge of React.js'
-        ],
-        task: 'code review',
-        tasksList: ['fixing bugs', 'updating docs', 'making me coffe'],
-        benefit: 'Coffe & tea',
-        benefitsList: ['multisport', 'multi steps', 'private helth insurance'],
+        description: '',
+        stack: { name: '', lv: '' },
+        stackList: [],
+        requirement: '',
+        requirementsList: [],
+        task: '',
+        tasksList: [],
+        benefit: '',
+        benefitsList: [],
         salary: { start: '', end: '' },
-        location: 'here',
-        locationsList: [{ name: 'remote' }, { name: 'Warsaw' }]
+        location: '',
+        locationsList: []
       },
       errors: {
         company: null,
@@ -661,52 +700,122 @@ export default {
       this.errors.benefits = validator.list(this.form.benefitsList, 20);
       this.errors.locations = validator.list(this.form.locationsList, 20);
       this.checkSalary(this.form.salary.start, this.form.salary.end);
+    },
+    deleteUnsavedForm() {
+      localStorage.removeItem('unsaved-new-offer');
+      this.recoveredForm = null;
+    },
+    recoverUnsavedForm() {
+      setDataToVueDataProp(this.form, this.recoveredForm.form);
+      // hadndle missing company?
+      this.recoveredForm = null;
     }
   },
   created() {
     this.timeouts = [];
+    const unsavedData = localStorage.getItem('unsaved-new-offer');
+    if (unsavedData !== null) {
+      try {
+        const recoveredForm = JSON.parse(unsavedData);
+        if (recoveredForm.userId !== this.userId) {
+          throw new Error('different user');
+        }
+        this.recoveredForm = recoveredForm;
+      } catch (err) {
+        console.log("couldn't parse unseved form: ", err);
+        localStorage.removeItem('unsaved-new-offer');
+      }
+    }
+  },
+  mounted() {
+    const vm = this;
+    this.windowCloseHandler = (ev) => {
+      let modified = [
+        'company',
+        'title',
+        'description',
+        'stack',
+        'stackList',
+        'requirement',
+        'requirementsList',
+        'task',
+        'tasksList',
+        'benefit',
+        'benefitsList',
+        'salary',
+        'location',
+        'locationsList'
+      ].some((prop) => {
+        if (typeof vm.form[prop] === 'string' || Array.isArray(vm.form[prop])) {
+          return vm.form[prop].length > 0;
+        }
+        for (const key in vm.form[prop]) {
+          return vm.form[prop][key].length > 0;
+        }
+      });
+
+      if (modified) {
+        const data = JSON.stringify(
+          {
+            userId: this.userId,
+            date: new Date(),
+            form: vm.form
+          },
+          null,
+          2
+        );
+        console.log('saving data');
+        localStorage.setItem('unsaved-new-offer', data);
+      }
+    };
+
+    window.addEventListener('beforeunload', this.windowCloseHandler);
+  },
+  beforeDestroy() {
+    window.removeEventListener('beforeunload', this.windowCloseHandler);
   },
   destroyed() {
     this.timeouts.forEach((t) => clearTimeout(t.id));
   },
   beforeRouteLeave(to, from, next) {
-    this.validateForm();
-    const anyError = checkNullAll(this.errors);
-    if (!anyError) {
-      alert('There are an errors in form, please correct them.');
-      return next(false);
-    }
-
     if (to.path.endsWith('offers/new/preview')) {
+      this.validateForm();
+      const anyError = checkNullAll(this.errors);
+      if (!anyError) {
+        alert('There are an errors in form, please correct them.');
+        return next(false);
+      }
       return next(true);
     }
 
-    let modified = [
-      'company',
-      'title',
-      'description',
-      'stack',
-      'stackList',
-      'requirement',
-      'requirementsList',
-      'task',
-      'tasksList',
-      'benefit',
-      'benefitsList',
-      'salary',
-      'location',
-      'locationsList'
-    ].some((prop) => this.form[prop].length > 0);
+    next(true);
 
-    if (
-      !modified ||
-      window.confirm(
-        'You have unsaved changes!\n\nDo you really want to leave?'
-      )
-    ) {
-      return next();
-    }
-    next(false);
+    // let modified = [
+    //   'company',
+    //   'title',
+    //   'description',
+    //   'stack',
+    //   'stackList',
+    //   'requirement',
+    //   'requirementsList',
+    //   'task',
+    //   'tasksList',
+    //   'benefit',
+    //   'benefitsList',
+    //   'salary',
+    //   'location',
+    //   'locationsList'
+    // ].some((prop) => this.form[prop].length > 0);
+
+    // if (
+    //   !modified ||
+    //   window.confirm(
+    //     'You have unsaved changes!\n\nDo you really want to leave?'
+    //   )
+    // ) {
+    //   return next();
+    // }
+    // next(false);
   }
 };
 </script>
