@@ -11,11 +11,15 @@
           >
           <select
             class="form-select"
+            :class="[
+              errors.company ? 'is-invalid' : touched.company ? 'is-valid' : ''
+            ]"
             id="offer-company"
             required
             aria-placeholder="select company"
             v-model="form.company"
             aria-describedby="offer-title-help-block"
+            @blur="checkCompany($event.target.value)"
           >
             <option selected disabled value="">
               Pick company for the offer
@@ -41,12 +45,16 @@
           <input
             type="text"
             class="form-control"
+            :class="[
+              errors.title ? 'is-invalid' : touched.title ? 'is-valid' : ''
+            ]"
             id="offer-title"
             placeholder="Job Title"
             required
             autocomplete="off"
-            v-model="form.title"
+            v-model.lazy="form.title"
             aria-describedby="offer-title-help-block"
+            @blur="checkTitle($event.target.value)"
           />
           <div id="offer-title-help-block" class="form-text text-danger">
             {{ errors.title }}
@@ -60,10 +68,18 @@
           >
           <textarea
             class="form-control"
+            :class="[
+              errors.description
+                ? 'is-invalid'
+                : touched.description
+                ? 'is-valid'
+                : ''
+            ]"
             id="offer-description"
             rows="3"
             v-model="form.description"
             aria-describedby="offer-description-help-block"
+            @blur="checkDescription($event.target.value)"
           ></textarea>
           <div id="offer-description-help-block" class="form-text text-danger">
             {{ errors.description }}
@@ -220,31 +236,33 @@
           <label for="offer-location" class="form-label fw-bold"
             >Available locations to work from</label
           >
-          <div class="input-group" style="flex-wrap: unset">
-            <input
-              id="offer-location"
-              type="text"
-              class="form-control"
-              placeholder="London, Warsaw, remote"
-              v-model="form.location"
-              aria-describedby="offer-locations-help-block"
-            />
-            <button
-              class="btn btn-outline-secondary"
-              type="button"
-              aria-label="add current location"
-            >
-              <i class="bi bi-geo-alt"></i>
-            </button>
-            <button
-              class="btn btn-outline-primary"
-              type="button"
-              aria-label="add element to locations list"
-              @click="addListElement('locationsList')"
-            >
-              <i class="bi bi-plus"></i>
-            </button>
-          </div>
+          <form @submit.prevent="addListElement('location')">
+            <div class="input-group" style="flex-wrap: unset">
+              <input
+                id="offer-location"
+                type="text"
+                class="form-control"
+                placeholder="London, Warsaw, remote"
+                required
+                v-model="form.location"
+                aria-describedby="offer-locations-help-block"
+              />
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                aria-label="add current location"
+              >
+                <i class="bi bi-geo-alt"></i>
+              </button>
+              <button
+                class="btn btn-outline-primary"
+                type="submit"
+                aria-label="add element to locations list"
+              >
+                <i class="bi bi-plus"></i>
+              </button>
+            </div>
+          </form>
           <div id="offer-locations-help-block" class="form-text text-danger">
             {{ errors.locations }}
           </div>
@@ -254,12 +272,12 @@
           >
             <span
               class="badge bg-success m-1"
-              :class="{ 'bg-warning': typeof loc === 'string' }"
+              :class="{ 'bg-warning': loc.name === 'remote' }"
               v-for="(loc, idx) in form.locationsList"
               :key="idx"
             >
-              {{ typeof loc === 'string' ? loc : loc.name }}
-              <i class="bi bi-geo-alt" v-if="typeof loc === 'object'"></i>
+              {{ loc.name }}
+              <i class="bi bi-geo-alt" v-if="loc.name !== 'remote'"></i>
             </span>
           </div>
           <hr />
@@ -269,33 +287,55 @@
           <label for="offer-slalary-start" class="form-label fw-bold"
             >Salary range</label
           >
-          <div class="input-group" style="flex-wrap: unset">
-            <span class="input-group-text">$ [k]</span>
-            <span class="input-group-text">from</span>
-            <input
-              type="number"
-              class="form-control"
-              id="offer-slalary-start"
-              placeholder="min salary: 5, 8.5, 12.8 - number in thousands"
-              required
-              v-model="form.salary.start"
-              aria-labelledby="offer-slalary-start"
-              aria-describedby="offer-salary-help-block"
-            />
-            <span class="input-group-text">to</span>
-            <input
-              type="number"
-              class="form-control"
-              id="offer-slalary-end"
-              required
-              placeholder="max salary: 8, 12.8, 25 - number in thousands"
-              v-model="form.salary.end"
-              aria-labelledby="offer-slalary-name"
-              aria-describedby="offer-salary-help-block"
-            />
-          </div>
+          <form>
+            <div class="input-group" style="flex-wrap: unset">
+              <span class="input-group-text">$ [k]</span>
+              <span class="input-group-text">from</span>
+              <input
+                class="form-control"
+                :class="[
+                  errors.salary.start
+                    ? 'is-invalid'
+                    : touched.salary.start
+                    ? 'is-valid'
+                    : ''
+                ]"
+                type="number"
+                id="offer-slalary-start"
+                placeholder="min salary: 5, 8.5, 12.8 - number in thousands"
+                required
+                min="1"
+                step="0.1"
+                v-model.number.lazy="form.salary.start"
+                aria-labelledby="offer-slalary-start"
+                aria-describedby="offer-salary-help-block"
+                @blur="salaryStartBlurHandler"
+              />
+              <span class="input-group-text">to</span>
+              <input
+                class="form-control"
+                :class="[
+                  errors.salary.end
+                    ? 'is-invalid'
+                    : touched.salary.end
+                    ? 'is-valid'
+                    : ''
+                ]"
+                type="number"
+                id="offer-slalary-end"
+                required
+                min="1"
+                step="0.1"
+                placeholder="max salary: 8, 12.8, 25 - number in thousands"
+                v-model.number.lazy="form.salary.end"
+                aria-labelledby="offer-slalary-name"
+                aria-describedby="offer-salary-help-block"
+                @blur="salaryEndBlurHandler"
+              />
+            </div>
+          </form>
           <div id="offer-salary-help-block" class="form-text text-danger">
-            {{ errors.salary }}
+            {{ errors.salary.start ? errors.salary.start : errors.salary.end }}
           </div>
         </div>
 
@@ -333,6 +373,8 @@
 <script>
 import OfferPropListVue from '../ui/offer-prop-list/OfferPropList.vue';
 import NewOfferInputListVue from './NewOfferInputList.vue';
+import * as validator from '../../validation/newOfferValidator.js';
+
 export default {
   components: {
     appOfferPropList: OfferPropListVue,
@@ -362,8 +404,8 @@ export default {
         }
       ],
       form: {
-        company: 'xcvf234245gy2442g425',
-        title: 'Vue Frontend Dev',
+        company: '',
+        title: '',
         description:
           'Top ten tech company in Africa is looking for top Vue developers.',
         stack: { name: 'MongoDB', lv: 'junior' },
@@ -377,23 +419,73 @@ export default {
         tasksList: ['fixing bugs', 'updating docs', 'making me coffe'],
         benefit: 'Coffe & tea',
         benefitsList: ['multisport', 'multi steps', 'private helth insurance'],
-        salary: { start: '6.5', end: '12' },
+        salary: { start: '', end: '' },
         location: 'here',
-        locationsList: ['remote', { name: 'Warsaw' }]
+        locationsList: [{ name: 'remote' }, { name: 'Warsaw' }]
       },
       errors: {
-        company: 'Please select for witch of your companies is this offer.',
-        title: 'Please specify the offer title.',
-        description: 'Description cannot exceed 5k chars.',
-        stack: 'Too many positions, please reduce to 10.',
-        requirements: 'Too many positions, please reduce to 10.',
-        tasks: 'Too many positions, please reduce to 10.',
-        benefits: 'Too many positions, please reduce to 20.',
-        salary:
-          'Incorrect value. Enter salary as monthly payment divided by one thousand.',
-        locations: 'Too many positions, please reduce to 20.'
+        company: null,
+        title: null,
+        description: null,
+        stack: null,
+        requirements: null,
+        tasks: null,
+        benefits: null,
+        salary: { start: null, end: null },
+        locations: null
+      },
+      touched: {
+        company: false,
+        title: false,
+        description: false,
+        salary: { start: false, end: false },
+        requirements: false,
+        tasks: false,
+        stack: false,
+        benefits: false,
+        locations: false
       }
     };
+  },
+  watch: {
+    'form.company'(val) {
+      this.checkCompany(val);
+    },
+    'form.title'(val) {
+      this.checkTitle(val);
+    },
+    'form.description'(val) {
+      this.checkDescription(val);
+    },
+    'form.salary.start'(val) {
+      this.touched.salary.start = true;
+      this.checkSalary(val, this.form.salary.end);
+    },
+    'form.salary.end'(val) {
+      this.touched.salary.start = true;
+      this.touched.salary.end = true;
+      this.checkSalary(this.form.salary.start, val);
+    },
+    'form.requirementsList'(val) {
+      this.touched.requirements = true;
+      this.errors.requirements = validator.list(val, 15);
+    },
+    'form.tasksList'(val) {
+      this.touched.tasks = true;
+      this.errors.tasks = validator.list(val, 15);
+    },
+    'form.stackList'(val) {
+      this.touched.stack = true;
+      this.errors.stack = validator.list(val, 15);
+    },
+    'form.benefitsList'(val) {
+      this.touched.benefits = true;
+      this.errors.benefits = validator.list(val, 20);
+    },
+    'form.locationsList'(val) {
+      this.touched.locations = true;
+      this.errors.locations = validator.list(val, 20);
+    }
   },
   methods: {
     submitHandler() {
@@ -403,6 +495,45 @@ export default {
       });
       this.timeouts = [];
       this.$router.replace('/user/offers/');
+    },
+    checkCompany(val) {
+      this.touched.company = true;
+      this.errors.company = validator.company(val);
+    },
+    checkTitle(val) {
+      this.touched.title = true;
+      this.errors.title = validator.title(val);
+    },
+    checkDescription(val) {
+      this.touched.description = true;
+      this.errors.description = validator.description(val, 5000);
+    },
+    checkSalary(start, end) {
+      const errors = validator.salary(start, end, this.touched.salary);
+
+      this.errors.salary.start = errors.start;
+      this.errors.salary.end = errors.end;
+    },
+    salaryStartBlurHandler(ev) {
+      this.touched.salary.start = true;
+      if (
+        ev.target.value !== '' &&
+        !this.touched.salaryEnd &&
+        this.form.salary.end === ''
+      ) {
+        const salaryStart = Number(ev.target.value);
+        this.form.salary.end =
+          salaryStart <= 5
+            ? Math.ceil(salaryStart) + 2
+            : Math.ceil(salaryStart + salaryStart * 0.3);
+      }
+
+      this.checkSalary(ev.target.value, this.form.salary.end);
+    },
+    salaryEndBlurHandler(ev) {
+      this.touched.salary.start = true;
+      this.touched.salary.end = true;
+      this.checkSalary(this.form.salary.start, ev.target.value);
     },
     showOfferPreview() {
       let missingRequiredField = ['title', 'company'].some(
@@ -447,8 +578,29 @@ export default {
             name: this.form.stack.name.trim(),
             lv: this.form.stack.lv.trim() || 'regular'
           };
+
           this.form.stack.name = '';
           this.form.stack.lv = '';
+
+          this.additemToList(
+            list,
+            value,
+            (x, item) => x.name.toLowerCase() === item.name.toLowerCase()
+          );
+
+          break;
+        }
+        case 'location': {
+          const list = this.form.locationsList;
+          const value = {
+            name: this.form.location.trim()
+          };
+
+          if (value.name.toLowerCase() === 'remote') {
+            value.name = value.name.toLowerCase();
+          }
+
+          this.form.location = '';
 
           this.additemToList(
             list,
