@@ -416,6 +416,7 @@ import {
   checkNullAll,
   setDataToVueDataProp
 } from '../../helpers';
+import firebaseAxios from '../../axios/firebase';
 
 export default {
   components: {
@@ -534,7 +535,36 @@ export default {
         t.cb();
       });
       this.timeouts = [];
-      this.$router.replace('/user/offers/');
+
+      this.validateForm();
+      const anyError = checkNullAll(this.errors);
+      if (!anyError) {
+        alert('form errors, correct');
+        return;
+      }
+      const payload = {
+        userId: this.userId,
+        createdAt: new Date(),
+        company: this.form.company,
+        title: this.form.title,
+        description: this.form.description,
+        requirements: this.form.requirementsList,
+        tasks: this.form.tasksList,
+        stack: this.form.stackList,
+        benefits: this.form.benefits,
+        salary: this.form.salary,
+        locations: this.form.locations
+      };
+      firebaseAxios
+        .post('offers.json', payload)
+        .then(({ data }) => {
+          // this.$router.replace('/user/offers/');
+          payload.id = data.name;
+          this.$router.replace('/offers/new/preview', { params: payload });
+        })
+        .catch((err) => {
+          this.error = err.message || err.toString();
+        });
     },
     checkCompany(val) {
       this.touched.company = true;
