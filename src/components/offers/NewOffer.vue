@@ -818,34 +818,41 @@ export default {
       return next(true);
     }
 
-    next(true);
+    let modified = [
+      'company',
+      'title',
+      'description',
+      'stack',
+      'stackList',
+      'requirement',
+      'requirementsList',
+      'task',
+      'tasksList',
+      'benefit',
+      'benefitsList',
+      'salary',
+      'location',
+      'locationsList'
+    ].some((prop) => this.form[prop].length > 0);
 
-    // let modified = [
-    //   'company',
-    //   'title',
-    //   'description',
-    //   'stack',
-    //   'stackList',
-    //   'requirement',
-    //   'requirementsList',
-    //   'task',
-    //   'tasksList',
-    //   'benefit',
-    //   'benefitsList',
-    //   'salary',
-    //   'location',
-    //   'locationsList'
-    // ].some((prop) => this.form[prop].length > 0);
+    if (!modified) {
+      return next();
+    }
 
-    // if (
-    //   !modified ||
-    //   window.confirm(
-    //     'You have unsaved changes!\n\nDo you really want to leave?'
-    //   )
-    // ) {
-    //   return next();
-    // }
-    // next(false);
+    new Promise((resolve, reject) => {
+      const confirmed = window.confirm(
+        'You have unsaved changes!\n\nDo you really want to leave?'
+      );
+      setTimeout(() => {
+        if (confirmed) {
+          return resolve();
+        }
+        return reject(new Error('cancelled by user'));
+        // will be replaced by custom dialog which will return promise
+      }, 1120);
+    })
+      .then(next)
+      .catch(() => next(false));
   }
 };
 </script>
