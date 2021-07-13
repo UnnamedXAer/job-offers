@@ -23,7 +23,7 @@ const getError = (code, params) => {
 
 export const company = val =>
   val.trim().length === 0
-    ? 'Please select for witch of your companies is this offer.'
+    ? 'Please select for which of your companies is this offer.'
     : null;
 
 export const title = val => {
