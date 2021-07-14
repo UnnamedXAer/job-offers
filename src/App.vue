@@ -4,7 +4,9 @@
     <div class="container-lg">
       <div class="row"></div>
       <div class="row">
-        <router-view />
+        <keep-alive include="NewOffer">
+          <router-view />
+        </keep-alive>
       </div>
     </div>
   </div>
