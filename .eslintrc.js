@@ -35,7 +35,7 @@ module.exports = {
       {
         anonymous: 'never',
         named: 'never',
-        asyncArrow: 'never'
+        asyncArrow: 'always'
       }
     ],
     // allow async-await
