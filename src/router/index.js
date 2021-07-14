@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
+import NotFoundVue from '@/components/NotFound/NotFound.vue';
 import HomeVue from '@/components/Home';
 import LookupVue from '@/components/lookup/Lookup.vue';
 import NewOfferVue from '@/components/offers/NewOffer.vue';
@@ -24,7 +25,23 @@ export default new Router({
       path: '/offers/new/preview',
       name: 'NewOfferPreview',
       component: NewOfferPreviewVue,
-      props: true
+      props: true,
+      beforeEnter(to, from, next) {
+        if (!to.params || !to.params.offer) {
+          return next({
+            name: 'NotFound',
+            query: {
+              reason: 'Missing offer'
+            }
+          });
+        }
+        next();
+      }
+    },
+    {
+      path: '/notfound',
+      name: 'NotFound',
+      component: NotFoundVue
     },
     {
       path: '/',
