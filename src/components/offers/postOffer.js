@@ -9,6 +9,7 @@ export const postOffer = async offerData => {
     return data.name;
   } catch (err) {
     console.log('Post offer: error:', err.message || err.toString());
+    EventBus.$emit('offer-created', err);
     throw err;
   }
 };

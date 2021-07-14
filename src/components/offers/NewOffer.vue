@@ -1,6 +1,20 @@
 <template>
   <keep-alive>
-    <div class="mb-5">
+    <div class="mb-5 position-relative">
+      <div
+        class="alert alert-danger alert-dismissible position-sticky"
+        style="top: 1rem; z-index: 1"
+        v-if="error"
+      >
+        {{ error }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+          @click="error = null"
+        ></button>
+      </div>
       <div class="row gx-0" v-if="recoveredForm">
         <div class="card text-dark border-warning mb-3">
           <div class="card-header bg-warning">
@@ -444,6 +458,7 @@ export default {
       userId: 'my-user-id',
       recoveredForm: null,
       loading: false,
+      error: null,
       datalists: {
         offerStackLv: [
           'junior',
@@ -582,7 +597,9 @@ export default {
         });
         this.$destroy();
       } catch (err) {
-        this.error = err.message || err.toString();
+        this.error =
+          'Could not post offer due to following error: ' + err.message ||
+          err.toString();
         this.loading = false;
       }
     },
@@ -765,7 +782,9 @@ export default {
   created() {
     this.offerCreatedHandler = (err) => {
       if (err) {
-        this.error = err.message || err.toString();
+        this.error =
+          'Offer was not posted due to following error: ' + err.message ||
+          err.toString();
         return;
       }
       this.$destroy();

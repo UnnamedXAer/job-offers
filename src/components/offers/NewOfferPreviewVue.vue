@@ -5,10 +5,16 @@
     <hr />
     <app-offer :offer="offer"> </app-offer>
 
-    <div class="alert alert-success" role="alert" v-if="newOfferId || (offer && offer.id)">
+    <div
+      class="alert alert-success"
+      role="alert"
+      v-if="newOfferId || (offer && offer.id)"
+    >
       <i class="bi bi-check-circle-fill me-2" style="font-size: 1.2em"></i> Your
       offer is created.
     </div>
+
+    <div class="alert alert-danger" v-if="error">{{ error }}</div>
 
     <div class="d-flex justify-content-evenly mt-5">
       <button
@@ -80,7 +86,9 @@ export default {
       try {
         this.newOfferId = await postOffer(this.offer);
       } catch (err) {
-        this.error = err.message || err.toString();
+        this.error =
+          'Could not post offer due to following error: ' + err.message ||
+          err.toString();
       }
       this.loading = false;
     },
