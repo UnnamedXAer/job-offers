@@ -1,10 +1,11 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import NotFoundVue from '@/components/NotFound/NotFound.vue';
+import NotFoundVue from '@/components/notfound/NotFound.vue';
 import HomeVue from '@/components/Home';
 import LookupVue from '@/components/lookup/Lookup.vue';
 import NewOfferVue from '@/components/offers/NewOffer.vue';
 import NewOfferPreviewVue from '@/components/offers/NewOfferPreviewVue.vue';
+import UserOffersVue from '@/components/offers/user-offers/UserOffers.vue';
 
 Vue.use(Router);
 
@@ -17,27 +18,17 @@ export default new Router({
       component: LookupVue
     },
     {
-      path: '/offers/new',
+      path: '/me/offers/new',
       name: 'CreateOffer',
       component: NewOfferVue
     },
     {
-      path: '/offers/new/preview',
+      path: '/me/offers/new/preview',
       name: 'NewOfferPreview',
       component: NewOfferPreviewVue,
-      props: true,
-      beforeEnter(to, from, next) {
-        if (!to.params || !to.params.offer) {
-          return next({
-            name: 'NotFound',
-            query: {
-              reason: 'Missing offer'
-            }
-          });
-        }
-        next();
-      }
+      props: true
     },
+    { path: '/me/offers', name: 'MyOffers', component: UserOffersVue },
     {
       path: '/notfound',
       name: 'NotFound',
@@ -50,7 +41,9 @@ export default new Router({
     },
     {
       path: '*',
-      redirect: '/'
+      redirect: {
+        name: 'NotFound'
+      }
     }
   ]
 });

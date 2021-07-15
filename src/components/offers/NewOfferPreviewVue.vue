@@ -1,8 +1,5 @@
 <template>
   <div v-if="offer">
-    <code>{{ stringOffer }}</code>
-
-    <hr />
     <app-offer :offer="offer"> </app-offer>
 
     <div
@@ -53,6 +50,24 @@
         Home
       </button>
     </div>
+  </div>
+  <div class="alert alert-warning" role="alert" v-else>
+    <h4 class="alert-heading">Missing offer</h4>
+    <p>
+      You can go to
+      <router-link :to="{ name: 'MyOffers' }" class="alert-link"
+        >Your account</router-link
+      >
+      to see your offers,
+      <router-link :to="{ name: 'CreateOffer' }" class="alert-link"
+        >create new one</router-link
+      >
+      or
+      <router-link :to="{ name: 'Lookup' }" class="alert-link"
+        >browse</router-link
+      >
+      for a job in lookup.
+    </p>
   </div>
 </template>
 

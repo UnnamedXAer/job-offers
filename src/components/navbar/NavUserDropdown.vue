@@ -20,7 +20,7 @@
         <div class="d-flex">
           <router-link
             class="dropdown-item"
-            to="/user/account"
+            to="/me/account"
             @click.native.stop="toggleUserMenu"
             ><i class="bi bi-person fs-5 pe-3"></i>
             <span class="nav-text">Dean Winchester</span></router-link
@@ -29,9 +29,15 @@
         <hr class="dropdown-divider" />
         <router-link
           class="dropdown-item"
-          to="/offers/new"
+          to="/me/offers/new"
           @click.native.stop="toggleUserMenu"
           >Create New Offer</router-link
+        >
+        <router-link
+          class="dropdown-item"
+          to="/me/offers"
+          @click.native.stop="toggleUserMenu"
+          >My Offers</router-link
         >
         <hr class="dropdown-divider" />
         <button class="dropdown-item" @click.stop="toggleUserMenu">
