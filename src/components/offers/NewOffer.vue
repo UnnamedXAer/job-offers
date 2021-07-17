@@ -403,6 +403,33 @@
             </div>
           </div>
 
+          <div class="mb-2">
+            <label for="offer-expirationdate" class="form-label fw-bold"
+              >Expiration Date</label
+            >
+            <input
+              class="form-control"
+              :class="[
+                errors.expirationDate
+                  ? 'is-invalid'
+                  : touched.expirationDate
+                  ? 'is-valid'
+                  : ''
+              ]"
+              type="date"
+              id="offer-expirationdate"
+              required
+              :min="expirationMinDate"
+              :placeholder="expirationDatePlaceholder"
+              v-model.lazy="form.expirationDate"
+              aria-labelledby="offer-expirationdate"
+              aria-describedby="offer-expirationdate-help-block"
+            />
+            <div id="offer-salary-help-block" class="form-text text-danger">
+              {{ errors.expirationDate }}
+            </div>
+          </div>
+
           <div class="d-flex justify-content-evenly mt-5">
             <button
               class="btn btn-outline-info btn-lg"
@@ -447,6 +474,8 @@ import {
 import { postOffer } from './postOffer';
 import { EventBus } from '../../events-bus';
 import addMonths from 'date-fns/addMonths';
+import format from 'date-fns/format';
+import addDays from 'date-fns/addDays';
 
 export default {
   name: 'NewOffer',
@@ -456,6 +485,8 @@ export default {
   },
   data() {
     return {
+      expirationMinDate: format(addDays(new Date(), 3), 'yyyy-MM-dd'),
+      expirationDatePlaceholder: format(addMonths(new Date(), 1), 'yyyy-MM-dd'),
       userId: 'my-user-id',
       recoveredForm: null,
       loading: false,
@@ -494,7 +525,8 @@ export default {
         benefitsList: [],
         salary: { start: '', end: '' },
         location: '',
-        locationsList: []
+        locationsList: [],
+        expirationDate: format(addMonths(new Date(), 1), 'yyyy-MM-dd')
       },
       errors: {
         company: null,
@@ -505,7 +537,8 @@ export default {
         tasks: null,
         benefits: null,
         salary: { start: null, end: null },
-        locations: null
+        locations: null,
+        expirationDate: null
       },
       touched: {
         company: false,
@@ -516,7 +549,8 @@ export default {
         tasks: false,
         stack: false,
         benefits: false,
-        locations: false
+        locations: false,
+        expirationDate: false
       }
     };
   },
@@ -558,6 +592,10 @@ export default {
     'form.locationsList'(val) {
       this.touched.locations = true;
       this.errors.locations = validator.list(val, 20);
+    },
+    'form.expirationDate'(val) {
+      this.touched.expirationDate = true;
+      this.errors.expirationDate = validator.expirationDate(val);
     }
   },
   methods: {
@@ -579,7 +617,7 @@ export default {
       const payload = {
         userId: this.userId,
         createdAt: new Date(),
-        expiresAt: addMonths(new Date(), 1),
+        expiresAt: this.form.expirationDate,
         company: this.form.company,
         title: this.form.title,
         description: this.form.description,

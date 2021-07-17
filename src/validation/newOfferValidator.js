@@ -1,3 +1,5 @@
+import { addDays, isAfter, parseISO } from 'date-fns';
+
 const errors = {
   e1000: 'This field is required.',
   e1100: 'Text cannot exceed $0 characters.',
@@ -5,6 +7,7 @@ const errors = {
   e1200: 'The $0, cannot be greater than $1.',
   e1201: '$0 end range value cannot be less than start ($1).',
   e1202: 'The $0 cannot be less than $1.',
+  e1203: 'The $0 cannot be earlier then $1',
   e1300: 'Negative values are not acceptable.'
 };
 
@@ -73,4 +76,13 @@ export const salary = (start, end, touched) => {
   }
 
   return errors;
+};
+
+export const expirationDate = date => {
+  const minDate = addDays(new Date().setHours(0, 0, 0, 0), 3);
+  const selectedDate = parseISO(date);
+  if (isAfter(minDate, selectedDate)) {
+    return getError('e1203', ['Expiration Date', minDate.toLocaleDateString()]);
+  }
+  return null;
 };
