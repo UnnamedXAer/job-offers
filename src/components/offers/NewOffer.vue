@@ -446,6 +446,7 @@ import {
 } from '../../helpers';
 import { postOffer } from './postOffer';
 import { EventBus } from '../../events-bus';
+import addMonths from 'date-fns/addMonths';
 
 export default {
   name: 'NewOffer',
@@ -578,6 +579,7 @@ export default {
       const payload = {
         userId: this.userId,
         createdAt: new Date(),
+        expiresAt: addMonths(new Date(), 1),
         company: this.form.company,
         title: this.form.title,
         description: this.form.description,
@@ -586,14 +588,20 @@ export default {
         stack: this.form.stackList,
         benefits: this.form.benefitsList,
         salary: this.form.salary,
-        locations: this.form.locations
+        locations: this.form.locationsList
       };
       try {
         const id = await postOffer(payload);
         payload.id = id;
         this.$router.push({
-          name: 'NewOfferPreview',
-          params: { offer: payload }
+          name: 'OfferPreview',
+          params: {
+            offer: payload,
+            id
+          },
+          query: {
+            create: 'success'
+          }
         });
         this.$destroy();
       } catch (err) {
@@ -673,7 +681,7 @@ export default {
         salary: salary
       };
 
-      this.$router.push({ name: 'NewOfferPreview', params: { offer } });
+      this.$router.push({ name: 'OfferPreview', params: { offer } });
     },
     removeElement(formFieldName, idx) {
       this.$delete(this.form[formFieldName], idx);

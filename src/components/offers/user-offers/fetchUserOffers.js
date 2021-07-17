@@ -20,7 +20,7 @@ function mapApiDataToOffers(data) {
   return offers;
 }
 
-function mapApiDataToOffer(
+export function mapApiDataToOffer(
   id,
   {
     userId,

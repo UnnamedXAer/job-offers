@@ -2,7 +2,7 @@
   <router-link
     class="list-group-item"
     role="listitem, link"
-    :to="{ name: 'NewOfferPreview', params: { offer: offer } }"
+    :to="{ name: 'OfferPreview', params: { offer: offer, id: offer.id } }"
   >
     <div class="d-flex w-100 justify-content-between">
       <h5 style="flex: 1">{{ offer.title }}</h5>
@@ -43,10 +43,10 @@ export default {
       return formatDistanceToNow(this.offer.createdAt, { addSuffix: true });
     },
     expiresAt() {
-      console.log(this.offer.expiresAt);
-      return this.offer.expiresAt
-        ? formatDistanceToNow(this.offer.expiresAt, { addSuffix: true })
-        : 'never';
+      if (isNaN(this.offer.expiresAt.getTime())) {
+        debugger;
+      }
+      return formatDistanceToNow(this.offer.expiresAt, { addSuffix: true });
     }
   }
 };
