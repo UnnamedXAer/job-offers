@@ -43,9 +43,6 @@ export default {
       return formatDistanceToNow(this.offer.createdAt, { addSuffix: true });
     },
     expiresAt() {
-      if (isNaN(this.offer.expiresAt.getTime())) {
-        debugger;
-      }
       return formatDistanceToNow(this.offer.expiresAt, { addSuffix: true });
     }
   }
