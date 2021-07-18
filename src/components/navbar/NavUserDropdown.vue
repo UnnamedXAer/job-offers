@@ -29,13 +29,13 @@
         <hr class="dropdown-divider" />
         <router-link
           class="dropdown-item"
-          to="/me/offers/new"
+          :to="{ name: 'CreateOffer' }"
           @click.native.stop="toggleUserMenu"
           >Create New Offer</router-link
         >
         <router-link
           class="dropdown-item"
-          to="/me/offers"
+          :to="{ name: 'UserOffers' }"
           @click.native.stop="toggleUserMenu"
           >My Offers</router-link
         >

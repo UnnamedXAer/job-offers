@@ -15,45 +15,17 @@
           @click="error = null"
         ></button>
       </div>
-      <div class="row gx-0" v-if="recoveredForm">
-        <div class="card text-dark border-warning mb-3">
-          <div class="card-header bg-warning">
-            <h5 class="card-title">Recovered form</h5>
-          </div>
-          <div class="card-body">
-            <p class="card-text">
-              We have recovered previous unsaved form from:
-              <time>{{ new Date(recoveredForm.date).toLocaleString() }}.</time>
-            </p>
-            <p>Whould you like to restre it?</p>
-            <div
-              class="
-                card-footer
-                bg-transparent
-                border-success
-                d-flex
-                align-items-center
-                justify-content-around justify-content-sm-end
-              "
-            >
-              <a
-                href="#"
-                @click="deleteUnsavedForm"
-                class="alert-link text-secondary"
-                >Dismiss</a
-              >
-              <button
-                class="btn btn-outline-success mx-sm-5"
-                @click="recoverUnsavedForm"
-              >
-                Recover
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+
+      <app-offer-form-recovered
+        :deleteUnsavedForm="deleteUnsavedForm"
+        :recoverUnsavedForm="recoverUnsavedForm"
+        :recoveredForm="recoveredForm"
+      ></app-offer-form-recovered>
+
       <div class="row">
-        <h1>Create a job offer</h1>
+        <h1>
+          {{ $route.params.id ? 'Modify the offer' : 'Create a job offer' }}
+        </h1>
       </div>
       <div class="row justify-content-center">
         <div class="col-12" style="max-width: 960px">
@@ -430,32 +402,12 @@
             </div>
           </div>
 
-          <div class="d-flex justify-content-evenly mt-5">
-            <button
-              class="btn btn-outline-info btn-lg"
-              :class="{ disabled: loading }"
-              :disabled="loading"
-              type="button"
-              @click="showOfferPreview"
-            >
-              Show Preview
-            </button>
-            <button
-              class="btn btn-primary btn-lg"
-              :class="{ disabled: loading }"
-              :disabled="loading"
-              type="button"
-              @click="submitHandler"
-            >
-              <span
-                class="spinner-border spinner-border-sm"
-                role="status"
-                v-if="loading"
-              ></span>
-              Post Offer
-              <span class="visually-hidden" v-if="loading">Loading...</span>
-            </button>
-          </div>
+          <app-offer-form-actions
+            :mode="$route.params.id ? 'update' : 'create'"
+            :loading="loading"
+            :showOfferPreview="showOfferPreview"
+            :submitHandler="submitForm"
+          ></app-offer-form-actions>
         </div>
       </div>
     </div>
@@ -476,12 +428,21 @@ import { EventBus } from '../../events-bus';
 import addMonths from 'date-fns/addMonths';
 import format from 'date-fns/format';
 import addDays from 'date-fns/addDays';
+import CreateOfferFormRecoveredVue from './CreateOfferFormRecovered.vue';
+import { fetchOffer } from './fetchOffer';
+import { updateOffer } from './updateOffer';
+import OfferFormActionsVue from './OfferFormActions.vue';
 
 export default {
   name: 'NewOffer',
   components: {
     appOfferPropList: OfferPropListVue,
-    appNewOfferInputList: NewOfferInputListVue
+    appNewOfferInputList: NewOfferInputListVue,
+    appOfferFormActions: OfferFormActionsVue,
+    appOfferFormRecovered: CreateOfferFormRecoveredVue
+  },
+  props: {
+    id: String
   },
   data() {
     return {
@@ -599,7 +560,7 @@ export default {
     }
   },
   methods: {
-    async submitHandler() {
+    async submitForm() {
       this.timeouts.forEach((t) => {
         clearTimeout(t.id);
         t.cb();
@@ -628,6 +589,33 @@ export default {
         salary: this.form.salary,
         locations: this.form.locationsList
       };
+
+      let id = this.$route.params.id;
+
+      if (id) {
+        try {
+          await updateOffer(id, payload);
+          payload.id = id;
+          this.$router.replace({
+            name: 'OfferPreview',
+            params: {
+              offer: payload,
+              id: id
+            },
+            query: {
+              update: 'success'
+            }
+          });
+          this.$destroy();
+        } catch (err) {
+          this.error =
+            'Could not update offer due to following error: ' + err.message ||
+            err.toString();
+          this.loading = false;
+        }
+        return;
+      }
+
       try {
         const id = await postOffer(payload);
         payload.id = id;
@@ -689,7 +677,7 @@ export default {
       this.checkSalary(this.form.salary.start, ev.target.value);
     },
     showOfferPreview() {
-      let missingRequiredField = ['title', 'company'].some(
+      let missingRequiredField = ['title', 'company', 'expidationDate'].some(
         (x) => this.form[x].length === 0
       );
 
@@ -716,7 +704,8 @@ export default {
         stack: this.form.stackList,
         description: this.form.description,
         title: this.form.title,
-        salary: salary
+        salary: salary,
+        expiresAt: new Date(this.form.expirationDate)
       };
 
       this.$router.push({ name: 'OfferPreview', params: { offer } });
@@ -826,6 +815,37 @@ export default {
     }
   },
   created() {
+    this.timeouts = [];
+    if (this.$route.params.id) {
+      this.fetchingOffer = true;
+      fetchOffer(this.$route.params.id)
+        .then((offer) => {
+          this.form.title = offer.title;
+          this.form.description = offer.description;
+          this.form.company = offer.company;
+          this.form.salary.start = offer.salary.start;
+          this.form.salary.end = offer.salary.end;
+          this.form.benefitsList = offer.benefits;
+          this.form.tasksList = offer.tasks;
+          this.form.stackList = offer.stack;
+          this.form.benefitsList = offer.benefits;
+          this.form.requirementsList = offer.requirements;
+          this.form.locationsList = offer.locations;
+          this.form.expirationDate = format(offer.expiresAt, 'yyyy-MM-dd');
+        })
+        .catch((err) => {
+          this.error =
+            'Could not fetch the offer data due to: ' +
+            (err.message || err.toString());
+        })
+        .finally(() => {
+          this.fetchingOffer = true;
+        });
+
+      // do not store unsaved changes in edit mode
+      return;
+    }
+
     this.offerCreatedHandler = (err) => {
       if (err) {
         this.error =
@@ -838,7 +858,6 @@ export default {
 
     EventBus.$on('offer-created', this.offerCreatedHandler);
 
-    this.timeouts = [];
     const unsavedData = localStorage.getItem('unsaved-new-offer');
     if (unsavedData !== null) {
       try {
@@ -854,6 +873,11 @@ export default {
     }
   },
   mounted() {
+    if (this.$route.params.id) {
+      // for now do not check if form was modified i edit mode
+      return;
+    }
+
     const vm = this;
     this.windowCloseHandler = (ev) => {
       let modified = [
@@ -880,6 +904,8 @@ export default {
         }
       });
 
+      modified = modified || this.touched.expirationDate;
+
       if (modified) {
         const data = JSON.stringify(
           {
@@ -898,12 +924,19 @@ export default {
     window.addEventListener('beforeunload', this.windowCloseHandler);
   },
   destroyed() {
+    if (this.$route.params.id) {
+      return;
+    }
     window.removeEventListener('beforeunload', this.windowCloseHandler);
     this.timeouts.forEach((t) => clearTimeout(t.id));
     EventBus.$off('offer-created', this.offerCreatedHandler);
   },
   beforeRouteLeave(to, from, next) {
     if (to.path.endsWith('offers/new/preview')) {
+      return next();
+    }
+
+    if (this.$route.params.id) {
       return next();
     }
 
@@ -924,6 +957,8 @@ export default {
       'locationsList'
     ].some((prop) => this.form[prop].length > 0);
 
+    modified = modified || this.touched.expirationDate;
+
     if (!modified) {
       return next();
     }
@@ -938,7 +973,7 @@ export default {
         }
         return reject(new Error('cancelled by user'));
         // will be replaced by custom dialog which will return promise
-      }, 1120);
+      }, 20);
     })
       .then(next)
       .catch(() => next(false));

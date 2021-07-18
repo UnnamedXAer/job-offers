@@ -3,8 +3,7 @@ import Router from 'vue-router';
 import NotFoundVue from '@/components/notfound/NotFound.vue';
 import HomeVue from '@/components/Home';
 import LookupVue from '@/components/lookup/Lookup.vue';
-import NewOfferVue from '@/components/offers/NewOffer.vue';
-import EditOfferVue from '@/components/offers/EditOffer.vue';
+import OfferFormVue from '@/components/offers/OfferForm.vue';
 import OfferPreviewVue from '@/components/offers/OfferPreview.vue';
 import UserOffersVue from '@/components/offers/user-offers/UserOffers.vue';
 
@@ -19,14 +18,14 @@ export default new Router({
       component: LookupVue
     },
     {
-      path: '/me/offers/new',
+      path: '/offers/new',
       name: 'CreateOffer',
-      component: NewOfferVue
+      component: OfferFormVue
     },
     {
       path: '/offers/edit/:id',
       name: 'EditOffer',
-      component: EditOfferVue
+      component: OfferFormVue
     },
     {
       path: '/offers/preview/:id',
@@ -34,7 +33,11 @@ export default new Router({
       component: OfferPreviewVue,
       props: true
     },
-    { path: '/me/offers', name: 'MyOffers', component: UserOffersVue },
+    {
+      path: '/me/offers',
+      name: 'UserOffers',
+      component: UserOffersVue
+    },
     {
       path: '/notfound',
       name: 'NotFound',

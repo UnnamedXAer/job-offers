@@ -1,10 +1,10 @@
 <template>
-  <div v-if="offer">
-    <app-offer :offer="offer"> </app-offer>
+  <div v-if="fetchedOffer">
+    <app-offer :offer="fetchedOffer"> </app-offer>
 
-    <div class="alert alert-success" role="alert" v-if="isNewOffer">
-      <i class="bi bi-check-circle-fill me-2" style="font-size: 1.2em"></i> Your
-      offer is created.
+    <div class="alert alert-success" role="alert" v-if="alertMessage">
+      <i class="bi bi-check-circle-fill me-2" style="font-size: 1.2em"></i>
+      {{ alertMessage }}
     </div>
 
     <div class="alert alert-danger" v-if="error">{{ error }}</div>
@@ -47,7 +47,9 @@
       </button>
 
       <button
-        v-if="isNewOffer || (offer && offer.id) || $route.params.id"
+        v-if="
+          isNewOffer || (fetchedOffer && fetchedOffer.id) || $route.params.id
+        "
         class="btn btn-outline-info btn-lg"
         type="button"
         @click="$router.push('/')"
@@ -56,11 +58,15 @@
       </button>
     </div>
   </div>
-  <div class="alert alert-warning" role="alert" v-else>
+  <div
+    class="alert alert-warning"
+    role="alert"
+    v-else-if="error !== null && !loading"
+  >
     <h4 class="alert-heading">Missing offer</h4>
     <p>
       You can go to
-      <router-link :to="{ name: 'MyOffers' }" class="alert-link"
+      <router-link :to="{ name: 'UserOffers' }" class="alert-link"
         >Your account</router-link
       >
       to see your offers,
@@ -77,6 +83,7 @@
 </template>
 
 <script>
+import { fetchOffer } from './fetchOffer';
 import OfferVue from './Offer.vue';
 import { postOffer } from './postOffer';
 export default {
@@ -88,7 +95,7 @@ export default {
   },
   data() {
     return {
-      loading: false,
+      loading: true,
       error: null,
       fetchedOffer: null
     };
@@ -96,6 +103,16 @@ export default {
   computed: {
     isNewOffer() {
       return this.$route.query.create === 'success';
+    },
+    alertMessage() {
+      if (this.$route.query.update === 'success') {
+        return 'Your offer is updated';
+      }
+      if (this.$route.query.create === 'success') {
+        return 'Your offer is created.';
+      }
+
+      return null;
     }
   },
   methods: {
@@ -124,6 +141,27 @@ export default {
         name: 'CreateOffer'
       });
     }
+  },
+  created() {
+    if (this.$route.params.offer) {
+      this.fetchedOffer = this.offer;
+      this.loading = false;
+      console.log('offer copied');
+      return;
+    }
+    fetchOffer(this.$route.params.id)
+      .then((offer) => {
+        console.log('offer fetched');
+        this.fetchedOffer = offer;
+      })
+      .catch((err) => {
+        this.error =
+          'Could not fetch the offer due to following error: ' +
+          (err.message || err.toString());
+      })
+      .finally(() => {
+        this.loading = false;
+      });
   }
 };
 </script>
