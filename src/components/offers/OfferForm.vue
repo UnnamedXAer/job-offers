@@ -285,13 +285,40 @@
                   required
                   v-model.lazy.trim="form.location"
                   aria-describedby="offer-locations-help-block"
+                  ref="location"
                 />
                 <button
-                  class="btn btn-outline-secondary"
+                  class="btn btn-outline-secondary position-relative"
                   type="button"
                   aria-label="add current location"
+                  @click="addCurrentLocation"
                 >
-                  <i class="bi bi-geo-alt"></i>
+                  <span
+                    v-if="geolocationError"
+                    class="
+                      position-absolute
+                      top-0
+                      start-0
+                      translate-middle
+                      p-2
+                      bg-danger
+                      border border-light
+                      rounded-circle
+                    "
+                    :title="geolocationError"
+                    @click.stop="geolocationError = null"
+                  >
+                    <span class="visually-hidden">New alerts</span>
+                  </span>
+                  <div
+                    class="spinner-border text-primary spinner-border-sm"
+                    style="font-size: 0.7em"
+                    role="status"
+                    v-if="geolocationLoading"
+                  >
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                  <i class="bi bi-geo-alt" v-else></i>
                 </button>
                 <button
                   class="btn btn-outline-primary"
@@ -301,8 +328,30 @@
                   <i class="bi bi-plus"></i>
                 </button>
               </div>
+              <div
+                class="input-group"
+                style="flex-wrap: unset"
+                v-if="form.locationLat"
+              >
+                <span class="input-group-text">Lat</span>
+                <input
+                  class="form-control form-control-sm"
+                  type="text"
+                  v-model="form.locationLat"
+                  readonly
+                />
+                <span class="input-group-text">Lng</span>
+                <input
+                  class="form-control form-control-sm"
+                  type="text"
+                  v-model="form.locationLng"
+                  readonly
+                />
+              </div>
             </form>
             <div id="offer-locations-help-block" class="form-text text-danger">
+              {{ geolocationError }}
+              <br v-if="errors.locations || geolocationError" />
               {{ errors.locations }}
             </div>
             <div
@@ -440,7 +489,7 @@ import { fetchOffer } from './fetchOffer';
 import { updateOffer } from './updateOffer';
 import OfferFormActionsVue from './OfferFormActions.vue';
 import { mockedCompanies } from '../../data_dev/mocked';
-import { getCustomLocation } from '../../helpers/customLocation';
+import { getCurrentLocation, getCustomLocation } from '../../helpers/location';
 
 export default {
   name: 'NewOffer',
@@ -461,6 +510,8 @@ export default {
       recoveredForm: null,
       loading: false,
       error: null,
+      geolocationLoading: false,
+      geolocationError: null,
       datalists: {
         offerStackLv: [
           'junior',
@@ -486,6 +537,8 @@ export default {
         benefitsList: [],
         salary: { start: '', end: '' },
         location: '',
+        locationLat: '',
+        locationLng: '',
         locationsList: [],
         expirationDate: format(addMonths(new Date(), 1), 'yyyy-MM-dd')
       },
@@ -716,6 +769,28 @@ export default {
 
       this.$router.push({ name: 'OfferPreview', params: { offer } });
     },
+    addCurrentLocation() {
+      if (this.geolocationLoading) {
+        return;
+      }
+
+      this.geolocationLoading = true;
+      this.geolocationError = null;
+
+      getCurrentLocation()
+        .then((loc) => {
+          this.form.location = loc.name;
+          this.form.locationLat = loc.coords.lat;
+          this.form.locationLng = loc.coords.lng;
+          this.$refs.location.focus();
+        })
+        .catch((err) => {
+          this.geolocationError = err.message;
+        })
+        .finally(() => {
+          this.geolocationLoading = false;
+        });
+    },
     removeElement(formFieldName, idx) {
       this.$delete(this.form[formFieldName], idx);
     },
@@ -742,7 +817,9 @@ export default {
         case 'location': {
           const list = this.form.locationsList;
           const value = {
-            name: this.form.location
+            name: this.form.location,
+            lat: this.form.locationLat,
+            lng: this.form.locationLng
           };
 
           if (this.customLocation(value.name)) {
@@ -750,6 +827,9 @@ export default {
           }
 
           this.form.location = '';
+          this.form.locationLat = '';
+          this.form.locationLng = '';
+          this.geolocationError = null;
 
           this.additemToList(
             list,
@@ -791,7 +871,7 @@ export default {
           );
           list.push(item);
         };
-        const timeout = { id: setTimeout(cb, 2300), cb };
+        const timeout = { id: setTimeout(cb, 300), cb };
 
         this.timeouts.push(timeout);
         return;
