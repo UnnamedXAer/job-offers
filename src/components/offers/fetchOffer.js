@@ -1,5 +1,5 @@
 import firebaseAxios from '../../axios/firebase';
-import { mockedCompanies } from './mocked';
+import { mockedCompanies } from '../../data_dev/mocked';
 import { mapApiDataToOffer } from './user-offers/fetchUserOffers';
 
 export const fetchOffer = async id => {

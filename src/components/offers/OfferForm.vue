@@ -171,15 +171,20 @@
             </datalist>
 
             <div
-              class="mt-2 d-flex border border-info rounded p-2"
+              class="mt-2 d-flex border border-info rounded py-2 px-1 flex-wrap"
               :class="{ 'border-warning': form.stackList.length > 10 }"
               v-if="form.stackList.length"
             >
               <span
-                class="badge bg-primary"
-                v-for="tech in form.stackList"
+                class="badge bg-primary m-1"
+                style="cursor: pointer"
+                v-for="(tech, idx) in form.stackList"
                 :key="tech.name"
-                >{{ tech.name }} <small v-if="tech.lv">{{ tech.lv }}</small>
+                @click="removeElement('stackList', idx)"
+                >{{ tech.name }}
+                <small class="__badge_small" v-if="tech.lv">{{
+                  tech.lv
+                }}</small>
               </span>
             </div>
             <hr />
@@ -278,7 +283,7 @@
                   class="form-control"
                   placeholder="London, Warsaw, remote"
                   required
-                  v-model="form.location"
+                  v-model.lazy.trim="form.location"
                   aria-describedby="offer-locations-help-block"
                 />
                 <button
@@ -301,17 +306,19 @@
               {{ errors.locations }}
             </div>
             <div
-              class="mt-2 d-flex border border-info rounded p-2"
+              class="mt-2 d-flex border border-info rounded p-2 flex-wrap"
               v-if="form.locationsList.length"
             >
               <span
                 class="badge bg-success m-1"
-                :class="{ 'bg-warning': loc.name === 'remote' }"
+                style="cursor: pointer"
+                :class="{ 'bg-warning': !!customLocation(loc.name) }"
                 v-for="(loc, idx) in form.locationsList"
                 :key="idx"
+                @click="removeElement('locationsList', idx)"
               >
                 {{ loc.name }}
-                <i class="bi bi-geo-alt" v-if="loc.name !== 'remote'"></i>
+                <i class="bi bi-geo-alt" v-if="!customLocation(loc.name)"></i>
               </span>
             </div>
             <hr />
@@ -432,7 +439,8 @@ import CreateOfferFormRecoveredVue from './CreateOfferFormRecovered.vue';
 import { fetchOffer } from './fetchOffer';
 import { updateOffer } from './updateOffer';
 import OfferFormActionsVue from './OfferFormActions.vue';
-import { mockedCompanies } from './mocked';
+import { mockedCompanies } from '../../data_dev/mocked';
+import { getCustomLocation } from '../../helpers/customLocation';
 
 export default {
   name: 'NewOffer',
@@ -734,10 +742,10 @@ export default {
         case 'location': {
           const list = this.form.locationsList;
           const value = {
-            name: this.form.location.trim()
+            name: this.form.location
           };
 
-          if (value.name.toLowerCase() === 'remote') {
+          if (this.customLocation(value.name)) {
             value.name = value.name.toLowerCase();
           }
 
@@ -810,7 +818,8 @@ export default {
       setDataToVueDataProp(this.form, this.recoveredForm.form);
       // hadndle missing company?
       this.recoveredForm = null;
-    }
+    },
+    customLocation: getCustomLocation
   },
   created() {
     this.timeouts = [];
@@ -978,3 +987,9 @@ export default {
   }
 };
 </script>
+<style scoped>
+.__badge_small {
+  font-size: 0.8em;
+  color: #ccc;
+}
+</style>

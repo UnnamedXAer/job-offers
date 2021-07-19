@@ -146,12 +146,10 @@ export default {
     if (this.$route.params.offer) {
       this.fetchedOffer = this.offer;
       this.loading = false;
-      console.log('offer copied');
       return;
     }
     fetchOffer(this.$route.params.id)
       .then((offer) => {
-        console.log('offer fetched');
         this.fetchedOffer = offer;
       })
       .catch((err) => {
