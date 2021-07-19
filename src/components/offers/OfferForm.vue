@@ -432,6 +432,7 @@ import CreateOfferFormRecoveredVue from './CreateOfferFormRecovered.vue';
 import { fetchOffer } from './fetchOffer';
 import { updateOffer } from './updateOffer';
 import OfferFormActionsVue from './OfferFormActions.vue';
+import { mockedCompanies } from './mocked';
 
 export default {
   name: 'NewOffer',
@@ -462,16 +463,7 @@ export default {
           'advanced'
         ]
       },
-      userCompanies: [
-        {
-          name: 'Go0gle',
-          id: 'faaf234245gy2442g425'
-        },
-        {
-          name: 'MasterBorn',
-          id: 'xcvf234245gy2442g425'
-        }
-      ],
+      userCompanies: mockedCompanies,
       form: {
         company: '',
         title: '',
@@ -596,6 +588,9 @@ export default {
         try {
           await updateOffer(id, payload);
           payload.id = id;
+          payload.company = this.userCompanies.find(
+            (company) => company.id === payload.company
+          );
           this.$router.replace({
             name: 'OfferPreview',
             params: {
@@ -619,6 +614,9 @@ export default {
       try {
         const id = await postOffer(payload);
         payload.id = id;
+        payload.company = this.userCompanies.find(
+          (company) => company.id === payload.company
+        );
         this.$router.push({
           name: 'OfferPreview',
           params: {
@@ -822,7 +820,7 @@ export default {
         .then((offer) => {
           this.form.title = offer.title;
           this.form.description = offer.description;
-          this.form.company = offer.company;
+          this.form.company = offer.company.id;
           this.form.salary.start = offer.salary.start;
           this.form.salary.end = offer.salary.end;
           this.form.benefitsList = offer.benefits;

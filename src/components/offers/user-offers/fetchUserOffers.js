@@ -1,9 +1,13 @@
 import firebaseAxios from '../../../axios/firebase';
+import { mockedCompanies } from '../mocked';
 
 export const fetchUserOffers = async (userId, companyId) => {
   const query = '';
   try {
     const { data } = await firebaseAxios.get('/offers.json?' + query);
+    for (const key in data) {
+      data[key].company = mockedCompanies.find(x => x.id === data[key].company);
+    }
     return mapApiDataToOffers(data);
   } catch (err) {
     console.log('fetch user offers: error: ', err);
