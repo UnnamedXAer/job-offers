@@ -738,7 +738,7 @@ export default {
       this.checkSalary(this.form.salary.start, ev.target.value);
     },
     showOfferPreview() {
-      let missingRequiredField = ['title', 'company', 'expidationDate'].some(
+      let missingRequiredField = ['title', 'company', 'expirationDate'].some(
         (x) => this.form[x].length === 0
       );
 
