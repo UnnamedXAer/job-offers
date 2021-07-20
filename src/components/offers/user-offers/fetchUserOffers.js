@@ -8,7 +8,8 @@ export const fetchUserOffers = async (userId, companyId) => {
     for (const key in data) {
       data[key].company = mockedCompanies.find(x => x.id === data[key].company);
     }
-    return mapApiDataToOffers(data);
+    const offers = mapApiDataToOffers(data);
+    return offers;
   } catch (err) {
     console.log('fetch user offers: error: ', err);
     throw err;
