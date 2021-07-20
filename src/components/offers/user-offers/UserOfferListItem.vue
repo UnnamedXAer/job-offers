@@ -2,7 +2,7 @@
   <router-link
     class="list-group-item"
     role="listitem, link"
-    :to="{ name: 'OfferPreview', params: { offer: offer, id: offer.id } }"
+    :to="{ name: 'OfferPreview', params: { id: offer.id } }"
   >
     <div class="d-flex w-100 justify-content-between">
       <h5 style="flex: 1">{{ offer.title }}</h5>

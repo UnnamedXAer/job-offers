@@ -1,5 +1,27 @@
 <template>
-  <div class="mb-5" v-if="fetchedOffer">
+  <div
+    class="alert alert-warning"
+    role="alert"
+    v-if="error !== null && !loading"
+  >
+    <h4 class="alert-heading">Missing offer</h4>
+    <p>
+      You can go to
+      <router-link :to="{ name: 'UserOffers' }" class="alert-link"
+        >Your account</router-link
+      >
+      to see your offers,
+      <router-link :to="{ name: 'CreateOffer' }" class="alert-link"
+        >create new one</router-link
+      >
+      or
+      <router-link :to="{ name: 'Lookup' }" class="alert-link"
+        >browse</router-link
+      >
+      for a job in lookup.
+    </p>
+  </div>
+  <div class="mb-5" v-else-if="fetchedOffer">
     <app-offer :offer="fetchedOffer"> </app-offer>
 
     <div class="alert alert-success" role="alert" v-if="alertMessage">
@@ -67,29 +89,6 @@
         </button>
       </div>
     </div>
-  </div>
-
-  <div
-    class="alert alert-warning"
-    role="alert"
-    v-else-if="error !== null && !loading"
-  >
-    <h4 class="alert-heading">Missing offer</h4>
-    <p>
-      You can go to
-      <router-link :to="{ name: 'UserOffers' }" class="alert-link"
-        >Your account</router-link
-      >
-      to see your offers,
-      <router-link :to="{ name: 'CreateOffer' }" class="alert-link"
-        >create new one</router-link
-      >
-      or
-      <router-link :to="{ name: 'Lookup' }" class="alert-link"
-        >browse</router-link
-      >
-      for a job in lookup.
-    </p>
   </div>
 </template>
 
