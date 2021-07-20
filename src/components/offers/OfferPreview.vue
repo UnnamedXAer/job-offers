@@ -22,10 +22,14 @@
       </button>
       <button
         class="btn btn-outline-info btn-lg"
-        :class="{ disabled: loading }"
-        :disabled="loading"
+        :class="{
+          disabled: loading,
+          'text-muted': alreadyExpired
+        }"
+        :disabled="loading || alreadyExpired"
         type="button"
         @click="showOfferForm"
+        :title="alreadyExpired ? 'Offer already expired' : ''"
       >
         Edit
       </button>
@@ -83,6 +87,7 @@
 </template>
 
 <script>
+import isBefore from 'date-fns/isBefore';
 import { fetchOffer } from './fetchOffer';
 import OfferVue from './Offer.vue';
 import { postOffer } from './postOffer';
@@ -103,6 +108,9 @@ export default {
   computed: {
     isNewOffer() {
       return this.$route.query.create === 'success';
+    },
+    alreadyExpired() {
+      return isBefore(this.fetchedOffer.expiresAt, new Date());
     },
     alertMessage() {
       if (this.$route.query.update === 'success') {

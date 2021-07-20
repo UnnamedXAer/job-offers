@@ -1,11 +1,29 @@
 <template>
   <section class="p-lg-5 p-sm-3 p-1">
-    <h4 class="px-lg-4" role="h1" style="padding-top: 0 !important">
+    <h4
+      class="px-lg-4"
+      :class="{ 'text-muted': alreadyExpired }"
+      role="h1"
+      style="padding-top: 0 !important"
+    >
       {{ offer.title }}
+      <span v-if="alreadyExpired"> [Expired]</span>
     </h4>
     <div class="__offer-details">
-      <div>
+      <div class="d-flex flex-row justify-content-between">
         <small>{{ offer.company.name }}</small>
+        <small
+          class="justify-self-end"
+          :class="{ 'text-danger': islastDay }"
+          :title="offer.expiresAt.toLocaleDateString()"
+        >
+          <span v-if="alreadyExpired">Expired </span>
+          <span v-else> Expires </span>
+          <time>{{ expirationTime }}</time>
+          <span class="visually-hidden">{{
+            offer.expiresAt.toLocaleDateString()
+          }}</span>
+        </small>
       </div>
       <div class="d-flex justify-content-between">
         <div>
@@ -70,11 +88,33 @@
 </template>
 
 <script>
+import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import { sub } from 'date-fns';
+import isBefore from 'date-fns/isBefore';
 export default {
   props: {
     offer: {
       type: Object,
       required: true
+    }
+  },
+  computed: {
+    expirationTime() {
+      return formatDistanceToNow(
+        this.offer.expiresAt.setHours(23, 59, 59, 999),
+        { addSuffix: true }
+      );
+    },
+    islastDay() {
+      return isBefore(
+        sub(this.offer.expiresAt, {
+          days: 1
+        }),
+        new Date()
+      );
+    },
+    alreadyExpired() {
+      return isBefore(this.offer.expiresAt, new Date());
     }
   }
 };

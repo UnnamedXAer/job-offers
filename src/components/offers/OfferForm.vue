@@ -631,7 +631,9 @@ export default {
       const payload = {
         userId: this.userId,
         createdAt: new Date(),
-        expiresAt: this.form.expirationDate,
+        expiresAt: new Date(
+          new Date(this.form.expirationDate).setHours(23, 59, 59, 999)
+        ),
         company: this.form.company,
         title: this.form.title,
         description: this.form.description,
