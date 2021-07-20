@@ -4,7 +4,7 @@
     <div class="container-lg">
       <div class="row"></div>
       <div class="row">
-        <keep-alive include="NewOffer">
+        <keep-alive include="OfferForm">
           <router-view :user="user" />
         </keep-alive>
       </div>
