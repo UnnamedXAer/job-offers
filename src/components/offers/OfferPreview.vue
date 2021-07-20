@@ -7,29 +7,29 @@
       {{ alertMessage }}
     </div>
 
-    <div class="alert alert-danger" v-if="error">{{ error }}</div>
+    <div class="alert alert-danger" v-if="error" id="offer-preview-error">
+      {{ error }}
+    </div>
 
-    <div class="row">
-      <div class="col-12" :class="actionColClass" v-if="!isNewOffer">
+    <div class="row __actions">
+      <div class="col-12" :class="actionColClass">
         <button
           class="btn btn-outline-info btn-lg"
           :class="{ disabled: loading }"
-          style="min-width: 90px; width: 100%"
           :disabled="loading"
           type="button"
-          @click="$router.go(-1)"
+          @click="backHandler"
         >
           Back
         </button>
       </div>
-      <div class="col-12" :class="actionColClass">
+      <div class="col-12" :class="actionColClass" v-if="isSavedOffer">
         <button
           class="btn btn-outline-info btn-lg"
           :class="{
             disabled: loading,
             'text-muted': alreadyExpired
           }"
-          style="min-width: 90px; width: 100%"
           :disabled="loading || alreadyExpired"
           type="button"
           @click="showOfferForm"
@@ -38,30 +38,18 @@
           Edit
         </button>
       </div>
-      <div
-        class="col-12"
-        :class="actionColClass"
-        v-if="
-          isNewOffer || (fetchedOffer && fetchedOffer.id) || $route.params.id
-        "
-      >
+      <div class="col-12" :class="actionColClass" v-if="isSavedOffer">
         <button
           class="btn btn-outline-info btn-lg"
-          style="min-width: 90px; width: 100%"
           type="button"
           @click="$router.push('/')"
         >
           Home
         </button>
       </div>
-      <div
-        class="col-12"
-        :class="actionColClass"
-        v-if="!isNewOffer && offer && !offer.id"
-      >
+      <div class="col-12" :class="actionColClass" v-if="canSave">
         <button
           class="btn btn-primary btn-lg"
-          style="width: 100%"
           :class="{ disabled: loading }"
           :disabled="loading"
           type="button"
@@ -74,7 +62,7 @@
           ></span>
           <span class="visually-hidden" v-if="loading">Loading...</span>
           <span style="font-size: 0.8em"
-            >It's ok, {{ $route.params.id ? 'update' : 'post' }} offer</span
+            >It's ok, {{ isSavedOffer ? 'update' : 'post' }} offer</span
           >
         </button>
       </div>
@@ -110,12 +98,15 @@ import isBefore from 'date-fns/isBefore';
 import { fetchOffer } from './fetchOffer';
 import OfferVue from './Offer.vue';
 import { postOffer } from './postOffer';
+import { mockedCompanies } from '../../data_dev/mocked';
+import { updateOffer } from './updateOffer';
 export default {
   components: {
     appOffer: OfferVue
   },
   props: {
-    offer: Object
+    offer: Object,
+    id: String
   },
   data() {
     return {
@@ -125,7 +116,13 @@ export default {
     };
   },
   computed: {
-    isNewOffer() {
+    canSave() {
+      return !!this.offer;
+    },
+    isSavedOffer() {
+      return this.id !== 'new';
+    },
+    isNewlyCreatedOffer() {
       return this.$route.query.create === 'success';
     },
     alreadyExpired() {
@@ -142,49 +139,81 @@ export default {
       return null;
     },
     actionColClass() {
-      return !(
-        this.isNewOffer ||
-        (this.fetchedOffer && this.fetchedOffer.id) ||
-        this.$route.params.id
-      ) || !(!this.isNewOffer && this.offer && !this.offer.id)
-        ? 'col-sm-4'
-        : 'col-sm-3';
+      if (!this.isSavedOffer) {
+        return 'col-sm-6';
+      }
+      if (this.canSave) {
+        return 'col-sm-3';
+      }
+      return 'col-sm-4';
     }
   },
   methods: {
     async postOffer() {
       this.loading = true;
-      this.error = true;
+      this.error = null;
+
+      if (this.isSavedOffer) {
+        try {
+          const id = await updateOffer(this.id, this.offer);
+          this.$router.replace({
+            name: 'OfferPreview',
+            params: { id },
+            query: {
+              update: 'success'
+            }
+          });
+        } catch (err) {
+          this.error =
+            'Could not update offer due to following error: ' + err.message;
+        }
+        this.loading = false;
+        return;
+      }
+
       try {
         const id = await postOffer(this.offer);
-        this.fetchedOffer = Object.assign({ id }, this.offer);
+        this.$router.replace({
+          name: 'OfferPreview',
+          params: { id },
+          query: {
+            create: 'success'
+          }
+        });
       } catch (err) {
         this.error =
-          'Could not post offer due to following error: ' + err.message ||
-          err.toString();
+          'Could not post offer due to following error: ' + err.message;
       }
       this.loading = false;
     },
     showOfferForm() {
-      if (this.$route.params.id) {
-        this.$router.push({
+      if (this.isSavedOffer) {
+        return this.$router.push({
           name: 'EditOffer',
-          params: { id: this.$route.params.id }
+          params: { id: this.id }
         });
-        return;
       }
       this.$router.replace({
         name: 'CreateOffer'
       });
+    },
+    backHandler() {
+      if (this.isNewlyCreatedOffer) {
+        return this.$router.replace({ name: 'CreateOffer' });
+      }
+      this.$router.go(-1);
     }
   },
   created() {
-    if (this.$route.params.offer) {
-      this.fetchedOffer = this.offer;
+    if (this.offer) {
+      this.fetchedOffer = {
+        ...this.offer,
+        company: mockedCompanies.find((x) => x.id === this.offer.company)
+      };
       this.loading = false;
       return;
     }
-    fetchOffer(this.$route.params.id)
+    fetchOffer(this.id)
       .then((offer) => {
         this.fetchedOffer = offer;
       })
@@ -200,5 +229,14 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.__actions > div {
+  display: flex;
+  justify-content: center;
+}
+
+.__actions > div > button {
+  width: 100%;
+  max-width: 500px;
+}
 </style>

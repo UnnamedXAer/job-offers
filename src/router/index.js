@@ -25,7 +25,8 @@ export default new Router({
     {
       path: '/offers/edit/:id',
       name: 'EditOffer',
-      component: OfferFormVue
+      component: OfferFormVue,
+      props: true
     },
     {
       path: '/offers/preview/:id',

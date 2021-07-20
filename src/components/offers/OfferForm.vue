@@ -492,7 +492,7 @@ import { mockedCompanies } from '../../data_dev/mocked';
 import { getCurrentLocation, getCustomLocation } from '../../helpers/location';
 
 export default {
-  name: 'NewOffer',
+  name: 'OfferForm',
   components: {
     appOfferPropList: OfferPropListVue,
     appNewOfferInputList: NewOfferInputListVue,
@@ -628,36 +628,16 @@ export default {
       }
       this.loading = true;
       this.error = null;
-      const payload = {
-        userId: this.userId,
-        createdAt: new Date(),
-        expiresAt: new Date(
-          new Date(this.form.expirationDate).setHours(23, 59, 59, 999)
-        ),
-        company: this.form.company,
-        title: this.form.title,
-        description: this.form.description,
-        requirements: this.form.requirementsList,
-        tasks: this.form.tasksList,
-        stack: this.form.stackList,
-        benefits: this.form.benefitsList,
-        salary: this.form.salary,
-        locations: this.form.locationsList
-      };
+      const payload = this.prepareOfferPayload();
 
-      let id = this.$route.params.id;
+      let id = this.id;
 
       if (id) {
         try {
           await updateOffer(id, payload);
-          payload.id = id;
-          payload.company = this.userCompanies.find(
-            (company) => company.id === payload.company
-          );
           this.$router.replace({
             name: 'OfferPreview',
             params: {
-              offer: payload,
               id: id
             },
             query: {
@@ -676,14 +656,9 @@ export default {
 
       try {
         const id = await postOffer(payload);
-        payload.id = id;
-        payload.company = this.userCompanies.find(
-          (company) => company.id === payload.company
-        );
         this.$router.push({
           name: 'OfferPreview',
           params: {
-            offer: payload,
             id
           },
           query: {
@@ -697,6 +672,25 @@ export default {
           err.toString();
         this.loading = false;
       }
+    },
+    prepareOfferPayload() {
+      const payload = {
+        userId: this.userId,
+        createdAt: this.id ? this.createdAt : new Date(),
+        expiresAt: new Date(
+          new Date(this.form.expirationDate).setHours(23, 59, 59, 999)
+        ),
+        company: this.form.company,
+        title: this.form.title,
+        description: this.form.description,
+        requirements: this.form.requirementsList,
+        tasks: this.form.tasksList,
+        stack: this.form.stackList,
+        benefits: this.form.benefitsList,
+        salary: this.form.salary,
+        locations: this.form.locationsList
+      };
+      return payload;
     },
     checkCompany(val) {
       this.touched.company = true;
@@ -756,20 +750,12 @@ export default {
         );
       }
 
-      const offer = {
-        company: this.userCompanies.find((x) => x.id === this.form.company),
-        benefits: this.form.benefitsList,
-        tasks: this.form.tasksList,
-        locations: this.form.locationsList,
-        requirements: this.form.requirementsList,
-        stack: this.form.stackList,
-        description: this.form.description,
-        title: this.form.title,
-        salary: salary,
-        expiresAt: new Date(this.form.expirationDate)
-      };
+      const offer = this.prepareOfferPayload();
 
-      this.$router.push({ name: 'OfferPreview', params: { offer } });
+      this.$router.push({
+        name: 'OfferPreview',
+        params: { offer, id: this.id || 'new' }
+      });
     },
     addCurrentLocation() {
       if (this.geolocationLoading) {
@@ -905,10 +891,11 @@ export default {
   },
   created() {
     this.timeouts = [];
-    if (this.$route.params.id) {
+    if (this.id) {
       this.fetchingOffer = true;
-      fetchOffer(this.$route.params.id)
+      fetchOffer(this.id)
         .then((offer) => {
+          this.createdAt = offer.createdAt;
           this.form.title = offer.title;
           this.form.description = offer.description;
           this.form.company = offer.company.id;
@@ -942,6 +929,7 @@ export default {
           err.toString();
         return;
       }
+      this.deleteUnsavedForm();
       this.$destroy();
     };
 
@@ -957,12 +945,14 @@ export default {
         this.recoveredForm = recoveredForm;
       } catch (err) {
         console.log("couldn't parse unseved form: ", err);
-        localStorage.removeItem('unsaved-new-offer');
+        // localStorage.removeItem('unsaved-new-offer');
+        this.deleteUnsavedForm();
       }
     }
   },
   mounted() {
-    if (this.$route.params.id) {
+    console.log('mounted - offer form', new Date());
+    if (this.id) {
       // for now do not check if form was modified i edit mode
       return;
     }
@@ -1005,7 +995,6 @@ export default {
           null,
           2
         );
-        console.log('saving data');
         localStorage.setItem('unsaved-new-offer', data);
       }
     };
@@ -1013,15 +1002,17 @@ export default {
     window.addEventListener('beforeunload', this.windowCloseHandler);
   },
   destroyed() {
-    if (this.$route.params.id) {
+    console.log('destroyed - offer form');
+    if (this.id) {
       return;
     }
+    console.log('', this.windowCloseHandler);
     window.removeEventListener('beforeunload', this.windowCloseHandler);
     this.timeouts.forEach((t) => clearTimeout(t.id));
     EventBus.$off('offer-created', this.offerCreatedHandler);
   },
   beforeRouteLeave(to, from, next) {
-    if (to.path.endsWith('offers/new/preview')) {
+    if (to.path.startsWith('/offers/preview/')) {
       return next();
     }
 
