@@ -1,5 +1,5 @@
 <template>
-  <div v-if="fetchedOffer">
+  <div class="mb-5" v-if="fetchedOffer">
     <app-offer :offer="fetchedOffer"> </app-offer>
 
     <div class="alert alert-success" role="alert" v-if="alertMessage">
@@ -9,59 +9,78 @@
 
     <div class="alert alert-danger" v-if="error">{{ error }}</div>
 
-    <div class="d-flex justify-content-evenly mt-5">
-      <button
-        v-if="!isNewOffer"
-        class="btn btn-outline-info btn-lg"
-        :class="{ disabled: loading }"
-        :disabled="loading"
-        type="button"
-        @click="$router.go(-1)"
-      >
-        Back
-      </button>
-      <button
-        class="btn btn-outline-info btn-lg"
-        :class="{
-          disabled: loading,
-          'text-muted': alreadyExpired
-        }"
-        :disabled="loading || alreadyExpired"
-        type="button"
-        @click="showOfferForm"
-        :title="alreadyExpired ? 'Offer already expired' : ''"
-      >
-        Edit
-      </button>
-      <button
-        v-if="!isNewOffer && offer && !offer.id"
-        class="btn btn-primary btn-lg"
-        :class="{ disabled: loading }"
-        :disabled="loading"
-        type="button"
-        @click="postOffer"
-      >
-        <span
-          class="spinner-border spinner-border-sm"
-          role="status"
-          v-if="loading"
-        ></span>
-        It's ok, post offer
-        <span class="visually-hidden" v-if="loading">Loading...</span>
-      </button>
-
-      <button
+    <div class="row">
+      <div class="col-12" :class="actionColClass" v-if="!isNewOffer">
+        <button
+          class="btn btn-outline-info btn-lg"
+          :class="{ disabled: loading }"
+          style="min-width: 90px; width: 100%"
+          :disabled="loading"
+          type="button"
+          @click="$router.go(-1)"
+        >
+          Back
+        </button>
+      </div>
+      <div class="col-12" :class="actionColClass">
+        <button
+          class="btn btn-outline-info btn-lg"
+          :class="{
+            disabled: loading,
+            'text-muted': alreadyExpired
+          }"
+          style="min-width: 90px; width: 100%"
+          :disabled="loading || alreadyExpired"
+          type="button"
+          @click="showOfferForm"
+          :title="alreadyExpired ? 'Offer already expired' : ''"
+        >
+          Edit
+        </button>
+      </div>
+      <div
+        class="col-12"
+        :class="actionColClass"
         v-if="
           isNewOffer || (fetchedOffer && fetchedOffer.id) || $route.params.id
         "
-        class="btn btn-outline-info btn-lg"
-        type="button"
-        @click="$router.push('/')"
       >
-        Home
-      </button>
+        <button
+          class="btn btn-outline-info btn-lg"
+          style="min-width: 90px; width: 100%"
+          type="button"
+          @click="$router.push('/')"
+        >
+          Home
+        </button>
+      </div>
+      <div
+        class="col-12"
+        :class="actionColClass"
+        v-if="!isNewOffer && offer && !offer.id"
+      >
+        <button
+          class="btn btn-primary btn-lg"
+          style="width: 100%"
+          :class="{ disabled: loading }"
+          :disabled="loading"
+          type="button"
+          @click="postOffer"
+        >
+          <span
+            class="spinner-border spinner-border-sm"
+            role="status"
+            v-if="loading"
+          ></span>
+          <span class="visually-hidden" v-if="loading">Loading...</span>
+          <span style="font-size: 0.8em"
+            >It's ok, {{ $route.params.id ? 'update' : 'post' }} offer</span
+          >
+        </button>
+      </div>
     </div>
   </div>
+
   <div
     class="alert alert-warning"
     role="alert"
@@ -121,6 +140,15 @@ export default {
       }
 
       return null;
+    },
+    actionColClass() {
+      return !(
+        this.isNewOffer ||
+        (this.fetchedOffer && this.fetchedOffer.id) ||
+        this.$route.params.id
+      ) || !(!this.isNewOffer && this.offer && !this.offer.id)
+        ? 'col-sm-4'
+        : 'col-sm-3';
     }
   },
   methods: {
