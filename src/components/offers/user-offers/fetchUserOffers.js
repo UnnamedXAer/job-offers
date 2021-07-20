@@ -1,7 +1,7 @@
 import firebaseAxios from '../../../axios/firebase';
 import { mockedCompanies } from '../../../data_dev/mocked';
 
-export const fetchUserOffers = async (userId, companyId) => {
+export const fetchUserOffers = async (userId, filters) => {
   const query = '';
   try {
     const { data } = await firebaseAxios.get('/offers.json?' + query);

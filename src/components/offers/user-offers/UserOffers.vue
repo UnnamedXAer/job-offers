@@ -3,20 +3,97 @@
     <h1>My Offers</h1>
 
     <div class="card card-body">
-      <label for="company-select" class="form-label">Change company</label>
-      <select
-        class="form-select form-select-lg"
-        id="company-select"
-        v-model="selectedCompany"
-      >
-        <option
-          v-for="company in userCompanies"
-          :key="company.id"
-          :value="company.id"
+      <div class="form-group mb-2">
+        <label for="company-select" class="form-label">Change company</label>
+        <select
+          class="form-select form-select-lg"
+          id="company-select"
+          v-model="filters.selectedCompany"
         >
-          {{ company.name }}
-        </option>
-      </select>
+          <option
+            v-for="company in userCompanies"
+            :key="company.id"
+            :value="company.id"
+          >
+            {{ company.name }}
+          </option>
+        </select>
+      </div>
+      <div class="form-group mb-2 row">
+        <label for="create-at-range" class="form-label">
+          Created: date range
+        </label>
+        <div
+          class="col input-group"
+          style="min-width: 235px"
+          id="create-at-range"
+        >
+          <label
+            for="date-start"
+            class="input-group-text"
+            style="min-width: 63px"
+          >
+            From
+          </label>
+          <input
+            id="date-start"
+            name="date-start"
+            class="form-control"
+            :class="{ 'is-invalid': errors.dateStart !== null }"
+            style="min-width: 120px"
+            type="date"
+            required
+            v-model="filters.dateStart"
+          />
+        </div>
+        <div
+          class="col input-group"
+          style="min-width: 235px"
+          id="create-at-range"
+        >
+          <label
+            for="date-end"
+            class="input-group-text"
+            style="min-width: 63px"
+          >
+            To
+          </label>
+          <input
+            id="date-end"
+            name="date-end"
+            class="form-control"
+            :class="{ 'is-invalid': errors.dateEnd !== null }"
+            style="min-width: 120px"
+            type="date"
+            required
+            v-model="filters.dateEnd"
+          />
+        </div>
+        <div
+          id="invalid-date-range"
+          class="invalid-feedback"
+          :style="{
+            display:
+              errors.dateStart !== null || errors.dateEnd !== null
+                ? 'block'
+                : 'none'
+          }"
+        >
+          {{ errors.dateStart }}
+          {{ errors.dateEnd }}
+        </div>
+      </div>
+
+      <div class="form-check mb-2">
+        <label for="show-expired" class="form-check-label">Show Expired</label>
+        <input
+          type="checkbox"
+          name="show-expired"
+          id="show-expired"
+          class="form-check-input"
+          v-model="filters.showExpired"
+        />
+      </div>
     </div>
 
     <div
@@ -44,6 +121,8 @@
 import { fetchUserOffers } from './fetchUserOffers';
 import { fetchUserCompanies } from './fetchUserCompanies';
 import UserOfferListVue from './UserOfferList.vue';
+import format from 'date-fns/format';
+import subMonths from 'date-fns/subMonths';
 export default {
   components: {
     appUserOffersList: UserOfferListVue
@@ -61,25 +140,63 @@ export default {
       error: null,
       offers: [],
       userCompanies: [],
-      selectedCompany: null
+      filters: {
+        selectedCompany: null,
+        dateStart: format(subMonths(new Date(), 1), 'yyyy-MM-dd'),
+        dateEnd: format(new Date(), 'yyyy-MM-dd'),
+        showExpired: false
+      },
+      errors: {
+        dateStart: null,
+        dateEnd: null
+      }
     };
   },
   watch: {
-    selectedCompany(val) {
+    'filters.selectedCompany'(val) {
       if (val) {
-        this.fetchOffers(val);
+        this.fetchOffers();
       }
+    },
+    'filters.dateStart'(val) {
+      this.$nextTick(this.validateDates(val, this.filters.dateEnd));
+    },
+    'filters.dateEnd'(val) {
+      this.$nextTick(this.validateDates(this.filters.dateStart, val));
+    },
+    'filters.showExpired'(val) {
+      this.fetchOffers();
     }
   },
   created() {
     this.fetchCompanies();
   },
   methods: {
-    async fetchOffers(company) {
+    validateDates(start, end) {
+      console.log('s:', start, 'e:', end);
+      this.errors.dateStart = null;
+      this.errors.dateEnd = null;
+      if (!start) {
+        this.errors.dateStart = 'Both dates are required.';
+      }
+      if (!end) {
+        this.errors.dateEnd = !start ? '' : 'Both dates are required.';
+        return;
+      }
+      if (Date.parse(start) > Date.parse(end)) {
+        this.errors.dateStart = '"From" cannot be later than "To"';
+        this.errors.dateEnd = '';
+        return;
+      }
+      this.fetchOffers();
+    },
+    async fetchOffers() {
+      const filters = { ...this.filters };
+
       this.loading = true;
       this.error = null;
       try {
-        this.offers = await fetchUserOffers(this.user.id, company);
+        this.offers = await fetchUserOffers(this.user.id, filters);
       } catch (err) {
         this.error =
           'We could not fetch your offers due to following reason: ' +
@@ -93,7 +210,7 @@ export default {
       try {
         this.userCompanies = await fetchUserCompanies(this.user.id);
         if (this.userCompanies.length > 0) {
-          this.selectedCompany = this.userCompanies[0].id;
+          this.filters.selectedCompany = this.userCompanies[0].id;
         }
       } catch (err) {
         this.error =
