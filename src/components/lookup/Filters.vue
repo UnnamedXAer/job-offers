@@ -1,5 +1,9 @@
 <template>
-  <div class="row card card-body align-items-center px-0 mx-sm-1 mx-lg-0" style="background-color: inherit">
+  <div
+    id="lookup-filters"
+    class="row card card-body align-items-center px-0 mx-sm-1 mx-lg-0"
+    style="background-color: inherit"
+  >
     <div class="row align-items-center px-0">
       <div class="col-lg-2">
         <h2 style="width: 100%; text-align: end">Search</h2>
@@ -63,19 +67,19 @@
 import GeoVue from '../ui/icons/Geo.vue';
 export default {
   components: {
-    appIconGeo: GeoVue,
+    appIconGeo: GeoVue
   },
   data() {
     return {
       form: {
         keyword: '',
-        location: '',
-      },
+        location: ''
+      }
     };
   },
   methods: {
-    search() {},
-  },
+    search() {}
+  }
 };
 </script>
 

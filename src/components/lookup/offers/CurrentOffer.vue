@@ -1,21 +1,46 @@
 <template>
   <div class="d-flex flex-column mb-5 __offer">
-    <app-offer :offer="offer"></app-offer>
+    <app-error v-if="error">{{ error }}</app-error>
+    <div class="position-relative">
+      <div
+        v-if="loading"
+        class="
+          position-absolute
+          w-100
+          h-100
+          d-flex
+          justify-content-center
+          align-items-center
+        "
+        style="background-color: rgb(233 236 239 / 35%)"
+      >
+        <div
+          class="spinner-border text-primary"
+          style="width: 4rem; height: 4rem; border-width: 0.4em; display: block"
+          role="status"
+        >
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <app-offer :offer="offer"></app-offer>
+    </div>
 
     <div class="position-sticky bottom-0 pb-2 __offer_actions">
+      <!-- <div class="position-fixed bottom-0 pb-2 __offer_actions"> -->
       <app-rule class="mb-2"></app-rule>
       <div
         class="alert alert-danger alert-dismissible"
         role="alert"
-        v-if="error"
+        v-if="actionError"
       >
-        {{ error }}
+        {{ actionError }}
         <button
           type="button"
           class="btn-close"
           data-bs-dismiss="alert"
           aria-label="Close"
-          @click="error = null"
+          @click="actionError = null"
         ></button>
       </div>
       <div class="d-flex flex-row justify-content-center align-items-center">
@@ -23,7 +48,13 @@
           class="btn btn-danger mx-1"
           style="min-width: 90px"
           :disabled="
-            offer.appliedAt || offer.rejectedAt || applying || rejecting
+            loading ||
+            error !== null ||
+            !offer ||
+            offer.appliedAt ||
+            offer.rejectedAt ||
+            applying ||
+            rejecting
           "
           @click="rejectOffer"
         >
@@ -38,7 +69,14 @@
         <button
           class="btn btn-warning mx-1"
           style="min-width: 90px"
-          :disabled="disabledNext || rejecting || applying"
+          :disabled="
+            disabledNext ||
+            loading ||
+            error !== null ||
+            !offer ||
+            rejecting ||
+            applying
+          "
           @click="nextOffer"
         >
           Later
@@ -47,7 +85,13 @@
           class="btn btn-primary btn-lg mx-3"
           style="min-width: 110px"
           :disabled="
-            offer.appliedAt || offer.rejectedAt || applying || rejecting
+            loading ||
+            error !== null ||
+            !offer ||
+            offer.appliedAt ||
+            offer.rejectedAt ||
+            applying ||
+            rejecting
           "
           @click="applyToOffer"
         >
@@ -68,24 +112,28 @@
 import FadeRuleVue from '../../ui/FadeRule.vue';
 import firebaseAxios from '../../../axios/firebase';
 import OfferVue from '../../offers/Offer.vue';
+import ErrorVue from '../../ui/alerts/Error.vue';
 
 export default {
   components: {
     appOffer: OfferVue,
-    appRule: FadeRuleVue
+    appRule: FadeRuleVue,
+    appError: ErrorVue
   },
   props: {
     offer: {
       type: Object,
       required: true
     },
-    disabledNext: Boolean
+    disabledNext: Boolean,
+    loading: Boolean,
+    error: String
   },
   data() {
     return {
       applying: false,
       rejecting: false,
-      error: null
+      actionError: null
     };
   },
   watch: {
@@ -136,7 +184,7 @@ export default {
         })
         .catch((err) => {
           // this.error = 'Could not reject the offer, please refresh page and try again.';
-          this.error = err.message || err.toString();
+          this.actionError = err.message || err.toString();
         })
         .finally(() => {
           this.rejecting = false;
@@ -155,7 +203,7 @@ export default {
         })
         .catch((err) => {
           // this.error = 'Could not accept the offer, please refresh page and try again.';
-          this.error = err.message || err.toString();
+          this.actionError = err.message || err.toString();
         })
         .finally(() => {
           this.applying = false;
@@ -172,6 +220,9 @@ export default {
 </script>
 
 <style scoped>
+.__offer {
+  min-height: 5rem;
+}
 .__offer_actions {
   background-color: rgba(250, 250, 250, 0.7);
   background: rgb(207, 207, 207);

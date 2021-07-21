@@ -1,33 +1,29 @@
 <template>
-  <div>
+  <div id="lookup">
     <app-filter></app-filter>
     <div class="row mt-3">
-      <div
-        class="spinner-border text-primary mx-auto"
-        style="width: 4rem; height: 4rem; border-width: 0.4em"
-        role="status"
-        v-if="loading"
-      >
-        <span class="visually-hidden">Loading...</span>
-      </div>
       <app-error v-if="error">{{ error }}</app-error>
     </div>
-    <app-offers
-      v-if="showRecomended && offers"
-      :offers="offers"
+    <app-recommended-offers
+      v-if="showRecomended && recommendedOffers"
+      :offers="recommendedOffers"
       :hide="hideRecomended"
-      :active-offer-idx="currentOfferIdx"
+      :active-offer-id="currentOfferId"
+      :loading="loadingRecommended"
+      :error="errorRecomended"
       @select-offer="setCurrentOffer"
-    ></app-offers>
+    ></app-recommended-offers>
 
     <section class="offer" v-if="currentOffer">
-      <app-offer
+      <app-current-offer
+        :loading="loadingCurrentOffer"
+        :error="errorCurrentOffer"
         :offer="currentOffer"
-        :disabled-next="offers.length === 0"
+        :disabled-next="recommendedOffers.length === 0"
         @next-offer="nextOffer"
         @offer-seen="markOfferAsSeen"
         @remove-offer="removeOffer"
-      ></app-offer>
+      ></app-current-offer>
     </section>
   </div>
 </template>
@@ -35,102 +31,115 @@
 <script>
 import ErrorVue from '../ui/alerts/Error.vue';
 import FiltersVue from './Filters.vue';
-import OffersVue from './offers/Offers.vue';
-import OfferVue from './offers/Offer.vue';
-import firebaseAxios from '../../axios/firebase';
-
-import { createDumbOffers } from '../../data_dev/offers_data';
+import RecommendedOffersVue from './offers/RecommendedOffers.vue';
+import CurrentOfferVue from './offers/CurrentOffer.vue';
+import { fetchLookupRecommendedOffers } from './fetchLookupOffers';
+import { fetchOffer } from '../offers/fetchOffer';
 
 export default {
   components: {
     appFilter: FiltersVue,
     appError: ErrorVue,
-    appOffers: OffersVue,
-    appOffer: OfferVue
+    appRecommendedOffers: RecommendedOffersVue,
+    appCurrentOffer: CurrentOfferVue
+  },
+  props: {
+    user: { type: Object, reqiired: true }
   },
   data() {
     return {
-      currentOfferIdx: -1,
-      offers: null,
-      loading: true,
-      error: null,
+      currentOfferId: null,
+      currentOffer: null,
+      loadingCurrentOffer: true,
+      errorCurrentOffer: null,
+      recommendedOffers: null,
+      loadingRecommended: true,
+      errorRecomended: null,
       showRecomended: true
     };
   },
-  computed: {
-    currentOffer() {
-      if (this.currentOfferIdx === -1) {
-        return null;
+  watch: {
+    currentOfferId(val) {
+      if (val !== null) {
+        this.fetchOffer(val);
       }
-      return this.offers[this.currentOfferIdx];
     }
   },
+
   methods: {
     hideRecomended() {
       this.showRecomended = false;
     },
     setCurrentOffer(id) {
-      this.currentOfferIdx = this.offers.findIndex((x) => x.id === id);
+      this.currentOfferId = id;
+    },
+    async fetchOffer(id) {
+      this.loadingCurrentOffer = true;
+      this.errorCurrentOffer = null;
+      try {
+        const offer = await fetchOffer(id);
+        this.currentOffer = offer;
+      } catch (err) {
+        this.errorCurrentOffer = err.message;
+      }
+      this.loadingCurrentOffer = false;
     },
     nextOffer() {
-      if (this.offers.length === 0) {
-        this.currentOfferIdx = -1;
+      if (this.recommendedOffers.length === 0) {
+        this.currentOfferId = null;
         return;
       }
-      if (this.currentOfferIdx < this.offers.length - 1) {
-        this.currentOfferIdx++;
+
+      let idx = this.recommendedOffers.findIndex(
+        (x) => x.id === this.currentOfferId
+      );
+
+      if (idx === -1) {
+        this.currentOfferId = null;
         return;
       }
-      this.currentOfferIdx = 0;
+
+      idx = idx < this.recommendedOffers.length - 1 ? idx + 1 : 0;
+      this.currentOfferId = this.recommendedOffers[idx].id;
     },
     removeOffer(id) {
-      const offerIdx = this.offers.findIndex((x) => x.id === id);
+      const offerIdx = this.recommendedOffers.findIndex((x) => x.id === id);
       if (offerIdx === -1) {
         return;
       }
 
-      this.offers.splice(offerIdx, 1);
-
-      if (this.currentOfferIdx >= this.offers.length) {
-        this.currentOfferIdx = this.offers.length - 1;
+      this.recommendedOffers.splice(offerIdx, 1);
+      if (this.recommendedOffers.length === 0) {
+        this.currentOfferId = null;
+        this.currentOffer = null;
+      } else if (offerIdx >= this.recommendedOffers.length) {
+        this.currentOfferId =
+          this.recommendedOffers[this.recommendedOffers.length - 1].id;
+      } else {
+        this.currentOfferId = this.recommendedOffers[offerIdx].id;
       }
     },
     markOfferAsSeen(id) {
-      const idx = this.offers.findIndex((x) => x.id === id);
+      const idx = this.recommendedOffers.findIndex((x) => x.id === id);
       if (idx !== -1) {
-        this.offers[idx].seenAt = new Date();
+        this.recommendedOffers[idx].seenAt = new Date();
       }
     }
   },
   created() {
-    this.loading = false;
-
     this.error = null;
-    this.loading = true;
-    firebaseAxios
-      .get('/offers.json')
-      .then(({ data }) => {
-        const offers = [];
-        for (const id in data) {
-          offers.push({
-            ...data[id],
-            id,
-            seenAt: data[id].seenAt || null
-          });
-        }
-        this.offers = offers;
-        this.currentOfferIdx = offers.length - 1;
-
-        if (offers.length === 0 && process.env.NODE_ENV !== 'production') {
-          createDumbOffers();
-        }
+    this.loadingRecommended = true;
+    fetchLookupRecommendedOffers(this.user.id)
+      .then((offers) => {
+        this.recommendedOffers = offers;
+        this.currentOfferId =
+          offers.length > 0 ? offers[offers.length - 1].id : null;
       })
       .catch((err) => {
-        console.log('fetch offers: error:', err);
-        this.error = err;
+        this.error = err.message;
       })
       .finally(() => {
-        this.loading = false;
+        this.loadingRecommended = false;
       });
   }
 };
