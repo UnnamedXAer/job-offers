@@ -11,7 +11,7 @@ import router from './router';
 
 /* eslint-disable no-new */
 new Vue({
-  el: '#app',
+  el: '#root',
   router,
   components: { App },
   template: '<App/>'

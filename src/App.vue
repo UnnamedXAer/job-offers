@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="app">
     <app-navbar></app-navbar>
     <div class="container-lg">
       <div class="row"></div>
