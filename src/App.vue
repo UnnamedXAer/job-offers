@@ -1,7 +1,7 @@
 <template>
-  <div id="app">
+  <div id="app" class="d-flex flex-column" style="min-height: 100vh">
     <app-navbar></app-navbar>
-    <div class="container-lg">
+    <div class="container-lg flex-grow-1">
       <div class="row"></div>
       <div class="row">
         <keep-alive include="OfferForm">

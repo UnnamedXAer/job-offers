@@ -1,18 +1,18 @@
 <template>
-  <div class="d-flex flex-column mb-5 __offer">
+  <div id="current-offer" class="d-flex flex-column mb-5">
     <app-error v-if="error">{{ error }}</app-error>
-    <div class="position-relative">
+    <div>
       <div
         v-if="loading"
         class="
-          position-absolute
+          position-relative
           w-100
           h-100
           d-flex
           justify-content-center
           align-items-center
+          py-5
         "
-        style="background-color: rgb(233 236 239 / 35%)"
       >
         <div
           class="spinner-border text-primary"
@@ -23,134 +23,84 @@
         </div>
       </div>
 
-      <app-offer :offer="offer"></app-offer>
-    </div>
+      <app-offer :offer="offer" v-if="offer" class="mb-5"></app-offer>
 
-    <div class="position-sticky bottom-0 pb-2 __offer_actions">
-      <!-- <div class="position-fixed bottom-0 pb-2 __offer_actions"> -->
-      <app-rule class="mb-2"></app-rule>
-      <div
-        class="alert alert-danger alert-dismissible"
-        role="alert"
-        v-if="actionError"
-      >
-        {{ actionError }}
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="alert"
-          aria-label="Close"
-          @click="actionError = null"
-        ></button>
-      </div>
-      <div class="d-flex flex-row justify-content-center align-items-center">
-        <button
-          class="btn btn-danger mx-1"
-          style="min-width: 90px"
-          :disabled="
-            loading ||
-            error !== null ||
-            !offer ||
-            offer.appliedAt ||
-            offer.rejectedAt ||
-            applying ||
-            rejecting
-          "
-          @click="rejectOffer"
-        >
-          <span
-            v-show="rejecting"
-            class="spinner-border spinner-border-sm"
-            role="status"
-            aria-hidden="true"
-          ></span>
-          {{ offer.rejectedAt ? 'Rejected' : 'Reject' }}
-        </button>
-        <button
-          class="btn btn-warning mx-1"
-          style="min-width: 90px"
-          :disabled="
-            disabledNext ||
-            loading ||
-            error !== null ||
-            !offer ||
-            rejecting ||
-            applying
-          "
-          @click="nextOffer"
-        >
-          Later
-        </button>
-        <button
-          class="btn btn-primary btn-lg mx-3"
-          style="min-width: 110px"
-          :disabled="
-            loading ||
-            error !== null ||
-            !offer ||
-            offer.appliedAt ||
-            offer.rejectedAt ||
-            applying ||
-            rejecting
-          "
-          @click="applyToOffer"
-        >
-          <span
-            v-show="applying"
-            class="spinner-border spinner-border-sm"
-            role="status"
-            aria-hidden="true"
-          ></span>
-          {{ offer.appliedAt ? 'Applied' : 'Apply' }}
-        </button>
-      </div>
+      <app-current-offer-actions
+        :disabled="!offer || loading || error !== null"
+        :actionError="actionError"
+        :appliedAt="offer && offer.appliedAt"
+        :rejectedAt="offer && offer.rejectedAt"
+        :applying="applying"
+        :rejecting="rejecting"
+        :applyToOffer="applyToOffer"
+        :rejectOffer="rejectOffer"
+        :nextOffer="nextOffer"
+        :disabledNext="1"
+      ></app-current-offer-actions>
     </div>
   </div>
 </template>
 
 <script>
-import FadeRuleVue from '../../ui/FadeRule.vue';
 import firebaseAxios from '../../../axios/firebase';
+import { fetchOffer } from '../../offers/fetchOffer';
 import OfferVue from '../../offers/Offer.vue';
 import ErrorVue from '../../ui/alerts/Error.vue';
+import CurrentOfferActionsVue from './CurrentOfferActions.vue';
 
 export default {
   components: {
     appOffer: OfferVue,
-    appRule: FadeRuleVue,
-    appError: ErrorVue
-  },
-  props: {
-    offer: {
-      type: Object,
-      required: true
-    },
-    disabledNext: Boolean,
-    loading: Boolean,
-    error: String
+    appError: ErrorVue,
+    appCurrentOfferActions: CurrentOfferActionsVue
   },
   data() {
     return {
+      offer: null,
+      loading: true,
+      error: null,
       applying: false,
       rejecting: false,
       actionError: null
     };
   },
   watch: {
-    offer() {
-      this.markOfferAsSeen();
+    offer(value) {
+      this.markOfferAsSeen(value);
+    },
+    '$route.params.id'() {
+      this.fetchOffer(this.$route.params.id);
     }
   },
   methods: {
-    nextOffer() {
-      this.$emit('next-offer');
-    },
-    markOfferAsSeen() {
-      clearTimeout(this.markSeenTimeout);
-      if (this.offer.seenAt) {
+    async fetchOffer(id) {
+      if (!id) {
+        this.error = 'Missing offer ID';
         return;
       }
-      const id = this.offer.id;
+
+      this.loading = true;
+      this.error = null;
+      clearTimeout(this.markSeenTimeout);
+
+      try {
+        const offer = await fetchOffer(id);
+        this.offer = offer;
+        this.loading = false;
+      } catch (err) {
+        this.error = err.message;
+      }
+    },
+    nextOffer() {
+      //   this.$emit('next-offer');
+    },
+    markOfferAsSeen(offer) {
+      console.log('about to mark', this.offer && this.offer.id);
+      clearTimeout(this.markSeenTimeout);
+      if (!offer || offer.seenAt) {
+        return;
+      }
+      const id = offer.id;
       this.markSeenTimeout = setTimeout(() => {
         if (!this.offer || this.offer.id !== id) {
           console.warn(
@@ -163,6 +113,7 @@ export default {
         firebaseAxios
           .put('/users-data/my-user-id/offers-seen/' + id + '.json', new Date())
           .then(() => {
+            console.log('marked', id);
             this.$emit('offer-seen', id);
           })
           .catch((err) => {
@@ -184,7 +135,7 @@ export default {
         })
         .catch((err) => {
           // this.error = 'Could not reject the offer, please refresh page and try again.';
-          this.actionError = err.message || err.toString();
+          this.actionError = err.message;
         })
         .finally(() => {
           this.rejecting = false;
@@ -203,7 +154,7 @@ export default {
         })
         .catch((err) => {
           // this.error = 'Could not accept the offer, please refresh page and try again.';
-          this.actionError = err.message || err.toString();
+          this.actionError = err.message;
         })
         .finally(() => {
           this.applying = false;
@@ -211,7 +162,7 @@ export default {
     }
   },
   mounted() {
-    this.markOfferAsSeen();
+    this.fetchOffer(this.$route.params.id);
   },
   destroyed() {
     clearTimeout(this.markSeenTimeout);
@@ -220,16 +171,4 @@ export default {
 </script>
 
 <style scoped>
-.__offer {
-  min-height: 5rem;
-}
-.__offer_actions {
-  background-color: rgba(250, 250, 250, 0.7);
-  background: rgb(207, 207, 207);
-  background: radial-gradient(
-    circle,
-    rgb(238, 238, 238) 50%,
-    rgba(207, 207, 207, 0.062) 100%
-  );
-}
 </style>

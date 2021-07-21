@@ -32,7 +32,7 @@
         >
           No recomendations found
         </p>
-        <div
+        <router-link
           v-for="offer in offers"
           :key="offer.id"
           class="
@@ -47,12 +47,12 @@
             user-select-none
           "
           :class="{ active: activeOfferId === offer.id }"
-          @click="selectOffer(offer.id)"
+          :to="'/lookup/' + offer.id"
         >
           <p class="text-primary text-center m-0">
             {{ offer.title }}
           </p>
-        </div>
+        </router-link>
       </div>
     </div>
   </section>

@@ -14,17 +14,7 @@
       @select-offer="setCurrentOffer"
     ></app-recommended-offers>
 
-    <section class="offer" v-if="currentOffer">
-      <app-current-offer
-        :loading="loadingCurrentOffer"
-        :error="errorCurrentOffer"
-        :offer="currentOffer"
-        :disabled-next="recommendedOffers.length === 0"
-        @next-offer="nextOffer"
-        @offer-seen="markOfferAsSeen"
-        @remove-offer="removeOffer"
-      ></app-current-offer>
-    </section>
+    <router-view></router-view>
   </div>
 </template>
 

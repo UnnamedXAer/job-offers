@@ -6,6 +6,7 @@ import LookupVue from '@/components/lookup/Lookup.vue';
 import OfferFormVue from '@/components/offers/OfferForm.vue';
 import OfferPreviewVue from '@/components/offers/OfferPreview.vue';
 import UserOffersVue from '@/components/offers/user-offers/UserOffers.vue';
+import CurrentOfferVue from '@/components/lookup/offers/CurrentOffer.vue';
 
 Vue.use(Router);
 
@@ -15,7 +16,10 @@ export default new Router({
     {
       path: '/lookup',
       name: 'Lookup',
-      component: LookupVue
+      component: LookupVue,
+      children: [
+        { name: 'LookupOffer', path: '/lookup/:id', component: CurrentOfferVue }
+      ]
     },
     {
       path: '/offers/new',
