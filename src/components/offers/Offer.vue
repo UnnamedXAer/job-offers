@@ -1,5 +1,5 @@
 <template>
-  <section class="p-lg-5 p-sm-3 p-1">
+  <section id="offer-data" class="p-lg-5 p-sm-3 p-1">
     <h4
       class="px-lg-4"
       :class="{ 'text-muted': alreadyExpired }"
