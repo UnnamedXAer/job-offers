@@ -22,7 +22,11 @@
           <span class="visually-hidden">Loading...</span>
         </div>
       </div>
-
+      <h3>next offer: {{ nextOfferId }}</h3>
+      <h3>current offer: {{ offer && offer.id }}</h3>
+      <div class="alert" v-if="haveSeenAllNeOffers">
+        <span class="fs-3">🤯</span> Your have seen all new offers.
+      </div>
       <app-offer :offer="offer" v-if="offer" class="mb-5"></app-offer>
 
       <app-current-offer-actions
@@ -34,7 +38,7 @@
         :rejecting="rejecting"
         :applyToOffer="applyToOffer"
         :rejectOffer="rejectOffer"
-        :nextOffer="nextOffer"
+        :nextOffer="skipOffer"
         :disabledNext="1"
       ></app-current-offer-actions>
     </div>
@@ -43,10 +47,10 @@
 
 <script>
 import firebaseAxios from '../../../axios/firebase';
-import { fetchOffer } from '../../offers/fetchOffer';
 import OfferVue from '../../offers/Offer.vue';
 import ErrorVue from '../../ui/alerts/Error.vue';
 import CurrentOfferActionsVue from './CurrentOfferActions.vue';
+import { mapState } from 'vuex';
 
 export default {
   components: {
@@ -56,44 +60,29 @@ export default {
   },
   data() {
     return {
-      offer: null,
-      loading: true,
-      error: null,
       applying: false,
       rejecting: false,
       actionError: null
     };
   },
+  computed: {
+    ...mapState({
+      offer: (state) => state.lookup.currentOffer,
+      loading: (state) => state.lookup.fetchingCurrentOffer,
+      error: (state) => state.lookup.fetchCurrentOfferError,
+      nextOfferId: (state) => state.lookup.nextOfferId,
+      haveSeenAllNeOffers: (state) => state.lookup.haveSeenAllNeOffers
+    })
+  },
   watch: {
     offer(value) {
       this.markOfferAsSeen(value);
     },
-    '$route.params.id'() {
-      this.fetchOffer(this.$route.params.id);
+    '$route.params.id'(value) {
+      this.$store.dispatch('getCurrentOffer', value);
     }
   },
   methods: {
-    async fetchOffer(id) {
-      if (!id) {
-        this.error = 'Missing offer ID';
-        return;
-      }
-
-      this.loading = true;
-      this.error = null;
-      clearTimeout(this.markSeenTimeout);
-
-      try {
-        const offer = await fetchOffer(id);
-        this.offer = offer;
-        this.loading = false;
-      } catch (err) {
-        this.error = err.message;
-      }
-    },
-    nextOffer() {
-      //   this.$emit('next-offer');
-    },
     markOfferAsSeen(offer) {
       console.log('about to mark', this.offer && this.offer.id);
       clearTimeout(this.markSeenTimeout);
@@ -110,16 +99,17 @@ export default {
           );
         }
 
-        firebaseAxios
-          .put('/users-data/my-user-id/offers-seen/' + id + '.json', new Date())
-          .then(() => {
-            console.log('marked', id);
-            this.$emit('offer-seen', id);
-          })
-          .catch((err) => {
-            // nothing to do here for now.
-            console.log('mark offer as seen: error:', err);
-          });
+        this.$store.commit('setSeenOffer', id);
+        // firebaseAxios
+        //   .put('/users-data/my-user-id/offers-seen/' + id + '.json', new Date())
+        //   .then(() => {
+        //     console.log('marked', id);
+        //     this.$emit('offer-seen', id);
+        //   })
+        //   .catch((err) => {
+        //     // nothing to do here for now.
+        //     console.log('mark offer as seen: error:', err);
+        //   });
       }, 1000);
     },
     rejectOffer() {
@@ -134,7 +124,6 @@ export default {
           this.$emit('remove-offer', this.offer.id);
         })
         .catch((err) => {
-          // this.error = 'Could not reject the offer, please refresh page and try again.';
           this.actionError = err.message;
         })
         .finally(() => {
@@ -153,16 +142,21 @@ export default {
           this.$emit('remove-offer', this.offer.id);
         })
         .catch((err) => {
-          // this.error = 'Could not accept the offer, please refresh page and try again.';
           this.actionError = err.message;
         })
         .finally(() => {
           this.applying = false;
         });
+    },
+    skipOffer() {
+      this.$router.push('/lookup/' + (this.nextOfferId || ''));
     }
   },
+  created() {
+    this.$store.dispatch('fetchNextOffers');
+  },
   mounted() {
-    this.fetchOffer(this.$route.params.id);
+    this.$store.dispatch('getCurrentOffer', this.$route.params.id);
   },
   destroyed() {
     clearTimeout(this.markSeenTimeout);

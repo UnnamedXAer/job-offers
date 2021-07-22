@@ -74,11 +74,6 @@ export default {
     hide: Function,
     loading: Boolean,
     error: String
-  },
-  methods: {
-    selectOffer(id) {
-      this.$emit('select-offer', id);
-    }
   }
 };
 </script>

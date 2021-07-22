@@ -427,7 +427,7 @@ import NewOfferInputListVue from './NewOfferInputList.vue';
 import * as validator from '../../validation/newOfferValidator.js';
 import { setTouchedAll, checkNullAll } from '../../helpers';
 import { updateOffer } from './updateOffer';
-import { fetchOffer } from './fetchOffer';
+import { fetchOffer } from '../../store/api/fetch';
 
 export default {
   name: 'NewOffer',

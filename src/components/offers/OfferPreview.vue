@@ -94,7 +94,7 @@
 
 <script>
 import isBefore from 'date-fns/isBefore';
-import { fetchOffer } from './fetchOffer';
+import { fetchOffer } from '../../store/api/fetch';
 import OfferVue from './Offer.vue';
 import { postOffer } from './postOffer';
 import { mockedCompanies } from '../../data_dev/mocked';

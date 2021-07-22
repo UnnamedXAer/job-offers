@@ -6,6 +6,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import Vue from 'vue';
 import App from './App';
 import router from './router';
+import store from './store';
 
 // Vue.config.productionTip = false;
 
@@ -14,7 +15,8 @@ new Vue({
   el: '#root',
   router,
   components: { App },
-  template: '<App/>'
+  template: '<App/>',
+  store
 });
 
 window.addEventListener('message', e => {

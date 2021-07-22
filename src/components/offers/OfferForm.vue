@@ -485,7 +485,7 @@ import addMonths from 'date-fns/addMonths';
 import format from 'date-fns/format';
 import addDays from 'date-fns/addDays';
 import CreateOfferFormRecoveredVue from './CreateOfferFormRecovered.vue';
-import { fetchOffer } from './fetchOffer';
+import { fetchOffer } from '../../store/api/fetch';
 import { updateOffer } from './updateOffer';
 import OfferFormActionsVue from './OfferFormActions.vue';
 import { mockedCompanies } from '../../data_dev/mocked';
