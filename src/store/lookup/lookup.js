@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { Store } from 'vuex';
-import { fetchOffer, fetchNextOffers } from './api/fetch';
-import { applyToOffer, markOfferAsSeen, rejectOffer } from './api/offerActions';
+import { fetchOffer, fetchNextOffers } from '../api/fetch';
+import { applyToOffer, markOfferAsSeen, rejectOffer } from '../api/offerActions';
 
 export const lookupConfig = {
   nextOffersBatchSize: 10,

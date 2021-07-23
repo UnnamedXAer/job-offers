@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import { store as lookupStore } from './lookup';
+import { store as lookupStore } from './lookup/lookup';
 
 Vue.use(Vuex);
 
