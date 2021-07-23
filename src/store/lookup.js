@@ -1,28 +1,29 @@
 // eslint-disable-next-line no-unused-vars
 import { Store } from 'vuex';
 import { fetchOffer, fetchNextOffers } from './api/fetch';
+import { applyToOffer, markOfferAsSeen, rejectOffer } from './api/offerActions';
 
 export const lookupConfig = {
   nextOffersBatchSize: 10,
   minNextOffers: 3
 };
 
-const initialState = {
-  nextOffersOffset: 0,
-  fetchingNextOffers: false,
-  fetchingNextOffersError: null,
-  nextOffers: [],
-  fetchingCurrentOffer: false,
-  fetchCurrentOfferError: null,
-  currentOffer: null,
-  nextOfferId: null,
-  seenOffers: [],
-  haveSeenAllNeOffers: false
-};
-
 /** @type {Store<initialState>} */
 export const store = {
-  state: { ...initialState, nextOffers: [...initialState.nextOffers] },
+  state: () => ({
+    nextOffersOffset: 0,
+    fetchingNextOffers: false,
+    fetchingNextOffersError: null,
+    nextOffers: [],
+    fetchingCurrentOffer: false,
+    fetchCurrentOfferError: null,
+    currentOffer: null,
+    nextOfferId: null,
+    seenOffers: [],
+    appliedOffers: [],
+    rejectedOffers: [],
+    haveSeenAllNeOffers: false
+  }),
   mutations: {
     fetchCurrentOfferStart(state) {
       state.fetchCurrentOfferError = null;
@@ -63,8 +64,14 @@ export const store = {
     setNextOfferId(state, id) {
       state.nextOfferId = id;
     },
-    setSeenOffer(state, id) {
+    setOfferSeen(state, { id }) {
       state.seenOffers = state.seenOffers.concat(id);
+    },
+    setOfferApplied(state, { id }) {
+      state.appliedOffers = state.appliedOffers.concat(id);
+    },
+    setOfferRejected(state, { id }) {
+      state.rejectedOffers = state.rejectedOffers.concat(id);
     }
   },
   actions: {
@@ -149,6 +156,31 @@ export const store = {
         !state.fetchNextOffers
       ) {
         dispatch('fetchNextOffers');
+      }
+    },
+    async markOfferSeen({ commit }, id) {
+      const now = new Date();
+      try {
+        await markOfferAsSeen(id, now);
+        commit('setOfferSeen', { id, date: now });
+      } catch (err) {}
+    },
+    async applyToOffer({ commit }, id) {
+      const now = new Date();
+      try {
+        await applyToOffer(id, now);
+        commit('setOfferApplied', { id, date: now });
+      } catch (err) {
+        throw err;
+      }
+    },
+    async rejectOffer({ commit }, id) {
+      const now = new Date();
+      try {
+        await rejectOffer(id, now);
+        commit('setOfferRejected', { id, date: now });
+      } catch (err) {
+        throw err;
       }
     }
   }

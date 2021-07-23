@@ -46,7 +46,12 @@
             align-items-center
             user-select-none
           "
-          :class="{ active: activeOfferId === offer.id }"
+          :class="{
+            active: activeOfferId === offer.id,
+            __seen: seenOffers.includes(offer.id),
+            __applied: appliedOffers.includes(offer.id),
+            __rejected: rejectedOffers.includes(offer.id)
+          }"
           :to="'/lookup/' + offer.id"
         >
           <p class="text-primary text-center m-0">
@@ -74,6 +79,17 @@ export default {
     hide: Function,
     loading: Boolean,
     error: String
+  },
+  computed: {
+    seenOffers() {
+      return this.$store.state.lookup.seenOffers;
+    },
+    appliedOffers() {
+      return this.$store.state.lookup.appliedOffers;
+    },
+    rejectedOffers() {
+      return this.$store.state.lookup.rejectedOffers;
+    }
   }
 };
 </script>
@@ -106,5 +122,31 @@ export default {
 }
 .__offer:last-of-type {
   margin-right: 0 !important;
+}
+
+.__seen {
+  position: relative;
+}
+
+.__seen::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  content: '👀';
+}
+
+.__applied::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  content: '📋';
+  border-color: tomato;
+}
+.__rejected::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  content: '🗑';
+  border-color: tomato;
 }
 </style>
