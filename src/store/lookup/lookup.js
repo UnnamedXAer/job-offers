@@ -1,15 +1,21 @@
-// eslint-disable-next-line no-unused-vars
-import { Store } from 'vuex';
 import { fetchOffer, fetchNextOffers } from '../api/fetch';
-import { applyToOffer, markOfferAsSeen, rejectOffer } from '../api/offerActions';
+import {
+  applyToOffer,
+  markOfferAsSeen,
+  rejectOffer
+} from '../api/offerActions';
+import { lookupRecommendedOffersStore } from './recommendedOffers';
 
 export const lookupConfig = {
   nextOffersBatchSize: 10,
   minNextOffers: 3
 };
 
-/** @type {Store<initialState>} */
-export const store = {
+/** @type {import('vuex').StoreOptions} */
+export const lookupStore = {
+  modules: {
+    recommended: lookupRecommendedOffersStore
+  },
   state: () => ({
     nextOffersOffset: 0,
     fetchingNextOffers: false,
@@ -24,6 +30,7 @@ export const store = {
     rejectedOffers: [],
     haveSeenAllNeOffers: false
   }),
+
   mutations: {
     fetchCurrentOfferStart(state) {
       state.fetchCurrentOfferError = null;
@@ -74,6 +81,7 @@ export const store = {
       state.rejectedOffers = state.rejectedOffers.concat(id);
     }
   },
+
   actions: {
     getCurrentOffer({ dispatch, commit, state }, id) {
       const offer = state.nextOffers.find(x => x.id === id);

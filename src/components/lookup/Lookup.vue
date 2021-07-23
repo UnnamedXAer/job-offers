@@ -22,7 +22,7 @@ import ErrorVue from '../ui/alerts/Error.vue';
 import FiltersVue from './Filters.vue';
 import RecommendedOffersVue from './offers/RecommendedOffers.vue';
 import CurrentOfferVue from './offers/CurrentOffer.vue';
-import { fetchLookupRecommendedOffers } from './fetchLookupOffers';
+import { mapState } from 'vuex';
 
 export default {
   components: {
@@ -36,34 +36,38 @@ export default {
   },
   data() {
     return {
-      recommendedOffers: [],
-      loadingRecommended: true,
-      errorRecomended: null,
+      error: null,
       showRecomended: true
     };
   },
-  watch: {},
-
+  computed: {
+    ...mapState({
+      recommendedOffers: (state) => state.lookup.recommended.offers,
+      loadingRecommended: (state) => state.lookup.recommended.loading,
+      errorRecomended: (state) => state.lookup.recommended.error
+    })
+  },
   methods: {
     hideRecomended() {
       this.showRecomended = false;
     }
   },
   created() {
-    this.error = null;
-    this.loadingRecommended = true;
-    fetchLookupRecommendedOffers(this.user.id)
-      .then((offers) => {
-        this.recommendedOffers = offers;
-        this.currentOfferId =
-          offers.length > 0 ? offers[offers.length - 1].id : null;
-      })
-      .catch((err) => {
-        this.error = err.message;
-      })
-      .finally(() => {
-        this.loadingRecommended = false;
-      });
+    this.$store.dispatch('fetchLookupRecommendedOffers');
+    // this.error = null;
+    // this.loadingRecommended = true;
+    // fetchLookupRecommendedOffers(this.user.id)
+    //   .then((offers) => {
+    //     this.recommendedOffers = offers;
+    //     this.currentOfferId =
+    //       offers.length > 0 ? offers[offers.length - 1].id : null;
+    //   })
+    //   .catch((err) => {
+    //     this.error = err.message;
+    //   })
+    //   .finally(() => {
+    //     this.loadingRecommended = false;
+    //   });
   }
 };
 </script>

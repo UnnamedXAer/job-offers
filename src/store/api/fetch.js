@@ -20,7 +20,6 @@ export const fetchNextOffers = async (userId, batchSize, startAt) => {
   // just for firebase as i don't want to waste time to make logic
   // to be able to sort by the create date in firebase
   const query = `?orderBy="createdAt"`;
-  console.log(query);
   try {
     const { data } = await firebaseAxios.get('/offers.json' + query);
 
@@ -29,6 +28,20 @@ export const fetchNextOffers = async (userId, batchSize, startAt) => {
       .splice(startAt, batchSize);
   } catch (err) {
     console.log('fetch next offers: error:', err);
+    throw err;
+  }
+};
+
+export const fetchLookupRecommendedOffers = async filters => {
+  let query = `?orderBy="createdAt"&limitToFirst=10`;
+  try {
+    const { data } = await firebaseAxios.get('/offers.json' + query);
+
+    const offers = mapApiDataToOffers(data);
+
+    return offers;
+  } catch (err) {
+    console.log('lookup: fetch recommended offers: error:', err);
     throw err;
   }
 };
