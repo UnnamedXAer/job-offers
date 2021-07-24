@@ -7,7 +7,7 @@ import {
 import { lookupRecommendedOffersStore } from './recommendedOffers';
 
 export const lookupConfig = {
-  nextOffersBatchSize: 10,
+  nextOffersBatchSize: 5,
   minNextOffers: 3
 };
 
@@ -65,9 +65,6 @@ export const lookupStore = {
       state.nextOffersOffset -= lookupConfig.nextOffersBatchSize;
       state.fetchNextOffersError = errorMsg;
     },
-    removeOfferFromNext(state, id) {
-      state.nextOffers = state.nextOffers.filter(x => x.id !== id);
-    },
     setNextOfferId(state, id) {
       state.nextOfferId = id;
     },
@@ -83,14 +80,19 @@ export const lookupStore = {
   },
 
   actions: {
-    getCurrentOffer({ dispatch, commit, state }, id) {
+    async getCurrentOffer({ dispatch, commit, state }, id) {
+      if (state.currentOffer && state.currentOffer.id === id) {
+        console.log('current offer already set');
+        return;
+      }
+
       const offer = state.nextOffers.find(x => x.id === id);
-      dispatch('setNextOfferId', id);
+      await dispatch('setNextOfferId', id);
       if (offer) {
         commit('fetchCurrentOfferSuccess', offer);
         return;
       }
-      dispatch('fetchCurrentOffer', id);
+      await dispatch('fetchCurrentOffer', id);
     },
 
     async fetchCurrentOffer({ commit }, id) {
@@ -103,13 +105,14 @@ export const lookupStore = {
 
       try {
         const offer = await fetchOffer(id);
+        console.log('fetched current offer');
         commit('fetchCurrentOfferSuccess', offer);
       } catch (err) {
         commit('fetchCurrentOfferFail', err.message);
       }
     },
 
-    setNextOfferId({ commit, dispatch, state }, currentOfferId) {
+    async setNextOfferId({ commit, dispatch, state }, currentOfferId) {
       if (state.nextOfferId && currentOfferId !== state.nextOfferId) {
         console.log('unnecessary call to set next offer id');
         return;
@@ -125,12 +128,16 @@ export const lookupStore = {
         return;
       }
 
-      if (!state.fetchingNextOffers) {
-        dispatch('fetchNextOffers');
-      }
+      commit('setNextOfferId', null);
+      await dispatch('fetchNextOffers');
     },
 
     async fetchNextOffers({ commit, dispatch, state }) {
+      if (state.fetchingNextOffers) {
+        console.log('----- ALREADY fetching next offers');
+        return;
+      }
+
       commit('fetchNextOffersStart');
       try {
         const offers = await fetchNextOffers(
@@ -138,13 +145,14 @@ export const lookupStore = {
           lookupConfig.nextOffersBatchSize,
           state.nextOffersOffset
         );
-        console.log(offers.map(x => x.id));
+        console.log('fetched Offers: ', offers.length);
         commit('fetchNextOffersSuccess', offers);
         if (
           !state.nextOfferId ||
           (state.currentOffer && state.currentOffer.id === state.nextOfferId)
         ) {
-          dispatch(
+          console.log('about to update next');
+          await dispatch(
             'setNextOfferId',
             state.currentOffer && state.currentOffer.id
           );
@@ -154,24 +162,14 @@ export const lookupStore = {
       }
     },
 
-    removeOfferFromNext({ commit, dispatch, state }, id) {
-      commit('removeOfferFromNext', id);
-      if (id === state.nextOfferId) {
-        dispatch('getNextOffer', state.currentOffer.id);
-      }
-      if (
-        state.nextOffers.length < lookupConfig.minNextOffers &&
-        !state.fetchNextOffers
-      ) {
-        dispatch('fetchNextOffers');
-      }
-    },
     async markOfferSeen({ commit }, id) {
       const now = new Date();
       try {
         await markOfferAsSeen(id, now);
         commit('setOfferSeen', { id, date: now });
-      } catch (err) {}
+      } catch (err) {
+        /* nothing to do here, error is not important that much to display it */
+      }
     },
     async applyToOffer({ commit }, id) {
       const now = new Date();
@@ -179,16 +177,17 @@ export const lookupStore = {
         await applyToOffer(id, now);
         commit('setOfferApplied', { id, date: now });
       } catch (err) {
-        throw err;
+        throw err; // handled in component
       }
     },
+
     async rejectOffer({ commit }, id) {
       const now = new Date();
       try {
         await rejectOffer(id, now);
         commit('setOfferRejected', { id, date: now });
       } catch (err) {
-        throw err;
+        throw err; // handled in component
       }
     }
   }

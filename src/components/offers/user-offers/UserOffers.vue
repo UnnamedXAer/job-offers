@@ -173,7 +173,6 @@ export default {
   },
   methods: {
     validateDates(start, end) {
-      console.log('s:', start, 'e:', end);
       this.errors.dateStart = null;
       this.errors.dateEnd = null;
       if (!start) {

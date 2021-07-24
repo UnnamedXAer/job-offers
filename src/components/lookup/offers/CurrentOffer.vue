@@ -22,11 +22,12 @@
           <span class="visually-hidden">Loading...</span>
         </div>
       </div>
-      <h3>next offer: {{ nextOfferId }}</h3>
-      <h3>current offer: {{ offer && offer.id }}</h3>
-      <div class="alert alert-info" v-if="haveSeenAllNeOffers">
-        <span class="fs-3">🤯</span> Your have seen all new offers.
-      </div>
+
+      <h4>current ID: {{ offer && offer.id }}</h4>
+      <h4>next ID: {{ nextOfferId }}</h4>
+
+      <app-no-new-offers v-if="haveSeenAllNeOffers"></app-no-new-offers>
+
       <app-offer :offer="offer" v-if="offer" class="mb-5"></app-offer>
 
       <app-current-offer-actions
@@ -49,13 +50,15 @@
 import OfferVue from '../../offers/Offer.vue';
 import ErrorVue from '../../ui/alerts/Error.vue';
 import CurrentOfferActionsVue from './CurrentOfferActions.vue';
+import NoNewOffersVue from './NoNewOffers.vue';
 import { mapState } from 'vuex';
 
 export default {
   components: {
     appOffer: OfferVue,
     appError: ErrorVue,
-    appCurrentOfferActions: CurrentOfferActionsVue
+    appCurrentOfferActions: CurrentOfferActionsVue,
+    appNoNewOffers: NoNewOffersVue
   },
   data() {
     return {
@@ -83,7 +86,6 @@ export default {
   },
   methods: {
     markOfferAsSeen(offer) {
-      console.log('about to mark', this.offer && this.offer.id);
       clearTimeout(this.markSeenTimeout);
       if (!offer || offer.seenAt) {
         return;
@@ -105,6 +107,7 @@ export default {
       this.rejecting = true;
       try {
         await this.$store.dispatch('rejectOffer', this.offer.id);
+        this.skipOffer();
       } catch (err) {
         this.actionError = err.message;
       }
@@ -114,21 +117,37 @@ export default {
       this.applying = true;
       try {
         await this.$store.dispatch('applyToOffer', this.offer.id);
+        this.skipOffer();
       } catch (err) {
         this.actionError = err.message;
       }
       this.applying = false;
     },
     skipOffer() {
-      this.$router.push('/lookup/' + (this.nextOfferId || ''));
+      if (this.nextOfferId) {
+        this.$router.push('/lookup/' + this.nextOfferId);
+        return;
+      }
+
+      this.$store.dispatch('fetchNextOffers').then(() => {
+        this.$router.push('/lookup/' + this.nextOfferId);
+      });
     }
   },
   created() {
-    this.$store.dispatch('fetchNextOffers');
+    const id = this.$route.params.id;
+    if (
+      this.$store.state.lookup.nextOffers.findIndex((x) => x.id === id) === -1
+    ) {
+      return this.$store
+        .dispatch('fetchCurrentOffer', id)
+        .then(() =>
+          this.$store.dispatch('setNextOfferId', this.$route.params.id)
+        );
+    }
+    this.$store.dispatch('getCurrentOffer', id);
   },
-  mounted() {
-    this.$store.dispatch('getCurrentOffer', this.$route.params.id);
-  },
+  mounted() {},
   destroyed() {
     clearTimeout(this.markSeenTimeout);
   }
