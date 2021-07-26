@@ -132,7 +132,7 @@ export const lookupStore = {
       await dispatch('fetchNextOffers');
     },
 
-    async fetchNextOffers({ commit, dispatch, state }) {
+    async fetchNextOffers({ commit, dispatch, state }, filters) {
       if (state.fetchingNextOffers) {
         console.log('----- ALREADY fetching next offers');
         return;
