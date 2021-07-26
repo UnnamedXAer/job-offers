@@ -77,6 +77,12 @@ export default {
     })
   },
   watch: {
+    error(value) {
+      console.log('------- eerr', value);
+    },
+    loading(val) {
+      console.log('watch, loading', val);
+    },
     offer(value) {
       this.markOfferAsSeen(value);
     },
@@ -103,6 +109,7 @@ export default {
         this.$store.dispatch('markOfferSeen', id);
       }, 1000);
     },
+
     async rejectOffer() {
       this.rejecting = true;
       try {
@@ -113,6 +120,7 @@ export default {
       }
       this.rejecting = false;
     },
+
     async applyToOffer() {
       this.applying = true;
       try {
@@ -123,6 +131,7 @@ export default {
       }
       this.applying = false;
     },
+
     skipOffer() {
       if (this.nextOfferId) {
         this.$router.push('/lookup/' + this.nextOfferId);
@@ -130,7 +139,12 @@ export default {
       }
 
       this.$store.dispatch('fetchNextOffers').then(() => {
-        this.$router.push('/lookup/' + this.nextOfferId);
+        console.log(this.nextOfferId);
+        if (this.nextOfferId) {
+          this.$router.push('/lookup/' + this.nextOfferId);
+          return;
+        }
+        alert('no next offers');
       });
     }
   },
