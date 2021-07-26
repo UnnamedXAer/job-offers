@@ -2,7 +2,7 @@
 const merge = require('webpack-merge');
 const prodEnv = require('./prod.env');
 
-const { parsed: dotEnv } = require('dotenv').config();
+let { parsed: dotEnv } = require('dotenv').config();
 
 console.log('dotenv: ', dotEnv);
 
