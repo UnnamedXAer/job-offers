@@ -54,20 +54,6 @@ export default {
   },
   created() {
     this.$store.dispatch('fetchLookupRecommendedOffers');
-    // this.error = null;
-    // this.loadingRecommended = true;
-    // fetchLookupRecommendedOffers(this.user.id)
-    //   .then((offers) => {
-    //     this.recommendedOffers = offers;
-    //     this.currentOfferId =
-    //       offers.length > 0 ? offers[offers.length - 1].id : null;
-    //   })
-    //   .catch((err) => {
-    //     this.error = err.message;
-    //   })
-    //   .finally(() => {
-    //     this.loadingRecommended = false;
-    //   });
   }
 };
 </script>
