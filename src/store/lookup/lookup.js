@@ -17,6 +17,7 @@ export const lookupStore = {
     recommended: lookupRecommendedOffersStore
   },
   state: () => ({
+    filters: null,
     nextOffersOffset: 0,
     fetchingNextOffers: false,
     fetchingNextOffersError: null,
@@ -76,6 +77,9 @@ export const lookupStore = {
     },
     setOfferRejected(state, { id }) {
       state.rejectedOffers = state.rejectedOffers.concat(id);
+    },
+    setFilters(state, filters) {
+      state.filters = filters;
     }
   },
 
