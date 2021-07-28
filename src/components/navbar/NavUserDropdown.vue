@@ -1,5 +1,5 @@
 <template>
-  <div class="nav-item dropdown">
+  <div class="nav-item dropdown" v-if="loggedUser">
     <a
       class="nav-link fs-3 fw-bold dropdown-toggle"
       href="#"
@@ -17,15 +17,15 @@
         v-if="expanded"
         aria-labelledby="navbarUserDropdownMenuLink"
       >
-        <div class="d-flex">
-          <router-link
-            class="dropdown-item"
-            to="/me/account"
-            @click.native.stop="toggleUserMenu"
-            ><i class="bi bi-person fs-5 pe-3"></i>
-            <span class="nav-text">Dean Winchester</span></router-link
-          >
-        </div>
+        <router-link
+          class="dropdown-item"
+          to="/me/account"
+          @click.native.stop="toggleUserMenu"
+          ><i class="bi bi-person fs-5 pe-3"></i>
+          <span class="nav-text">{{
+            loggedUser.fname + ' ' + loggedUser.lname
+          }}</span>
+        </router-link>
         <hr class="dropdown-divider" />
         <router-link
           class="dropdown-item"
@@ -54,6 +54,11 @@ export default {
     return {
       expanded: false
     };
+  },
+  computed: {
+    loggedUser() {
+      return this.$store.state.auth.user;
+    }
   },
   watch: {
     expanded(val) {

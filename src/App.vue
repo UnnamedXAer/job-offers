@@ -25,6 +25,9 @@ export default {
         id: 'my-user-id'
       }
     };
+  },
+  created() {
+    this.$store.dispatch('authenticate');
   }
 };
 </script>

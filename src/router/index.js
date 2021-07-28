@@ -7,6 +7,7 @@ import OfferFormVue from '@/components/offers/OfferForm.vue';
 import OfferPreviewVue from '@/components/offers/OfferPreview.vue';
 import UserOffersVue from '@/components/offers/user-offers/UserOffers.vue';
 import CurrentOfferVue from '@/components/lookup/offers/CurrentOffer.vue';
+import MyAccountVue from '@/components/user/MyAccount.vue';
 
 Vue.use(Router);
 
@@ -42,6 +43,11 @@ export default new Router({
       path: '/me/offers',
       name: 'UserOffers',
       component: UserOffersVue
+    },
+    {
+      path: '/me/account',
+      name: 'MyAccount',
+      component: MyAccountVue
     },
     {
       path: '/notfound',
