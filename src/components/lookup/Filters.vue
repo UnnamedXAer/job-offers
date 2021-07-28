@@ -79,7 +79,9 @@
       </form>
     </div>
     <div class="row mt-3">
-      <app-error v-if="error">{{ error }}</app-error>
+      <app-error v-if="fetchError || error" :dismiss="dismissErrors">{{
+        fetchError || error
+      }}</app-error>
     </div>
   </div>
 </template>
@@ -105,12 +107,18 @@ export default {
       error: null
     };
   },
+  computed: {
+    fetchError() {
+      return this.$store.state.lookup.fetchNextOffersError;
+    }
+  },
   methods: {
     search() {
       this.$store.commit('setFilters', { ...this.form });
       this.$store.dispatch('fetchNextOffers');
     },
     async getCurrentLocation() {
+      this.error = null;
       getCurrentLocation()
         .then((loc) => {
           this.form.location = loc.name;
@@ -118,6 +126,10 @@ export default {
         .catch((err) => {
           this.error = err.message;
         });
+    },
+    dismissErrors() {
+      this.error = null;
+      this.$store.commit('setFetchNextOffersError', null);
     }
   }
 };

@@ -71,6 +71,9 @@ export const lookupStore = {
       state.fetchNextOffersError = errorMsg;
       state.fetchingNextOffers = false;
     },
+    setFetchNextOffersError(state, err) {
+      state.fetchNextOffersError = err;
+    },
     setNextOfferId(state, id) {
       state.nextOfferId = id;
     },
