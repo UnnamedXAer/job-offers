@@ -22,42 +22,42 @@
           @click="hide"
         ></button>
       </div>
-      <div
-        class="mt-3 d-flex justify-content-center __recommended-offers"
-        role="link"
-      >
-        <p
-          class="text-muted fw-light"
-          v-if="!loading && error === null && offers.length === 0"
-        >
-          No recomendations found
-        </p>
-        <router-link
-          v-for="offer in offers"
-          :key="offer.id"
-          class="
-            __offer
-            card
-            mx-2
-            p-1
-            mb-2
-            d-flex
-            justify-content-center
-            align-items-center
-            user-select-none
-          "
-          :class="{
-            active: activeOfferId === offer.id,
-            __seen: seenOffers.includes(offer.id),
-            __applied: appliedOffers.includes(offer.id),
-            __rejected: rejectedOffers.includes(offer.id)
-          }"
-          :to="'/lookup/' + offer.id"
-        >
-          <p class="text-primary text-center m-0">
-            {{ offer.title }}
+      <div class="mt-3 __recommended-offers">
+        <div class="d-flex">
+          <p
+            class="text-muted fw-light"
+            v-if="!loading && error === null && offers.length === 0"
+          >
+            No recomendations found
           </p>
-        </router-link>
+
+          <router-link
+            v-for="offer in offers"
+            :key="offer.id"
+            class="
+              __offer
+              card
+              mx-2
+              p-1
+              mb-2
+              d-flex
+              justify-content-center
+              align-items-center
+              user-select-none
+            "
+            :class="{
+              active: activeOfferId === offer.id,
+              __seen: seenOffers.includes(offer.id),
+              __applied: appliedOffers.includes(offer.id),
+              __rejected: rejectedOffers.includes(offer.id)
+            }"
+            :to="'/lookup/' + offer.id"
+          >
+            <p class="text-primary text-center m-0">
+              {{ offer.title }}
+            </p>
+          </router-link>
+        </div>
       </div>
     </div>
   </section>
@@ -100,11 +100,19 @@ export default {
 }
 
 .__recommended-offers {
-  overflow-x: auto;
   max-height: 7rem;
+  overflow-x: auto;
+}
+
+.__recommended-offers > div::after,
+.__recommended-offers > div::before {
+  content: '';
+  margin-right: auto;
+  margin-right: auto;
 }
 
 .__offer {
+  min-height: 4em;
   width: 160px !important;
   max-height: 100%;
   cursor: pointer;
