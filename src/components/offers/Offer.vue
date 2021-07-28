@@ -8,6 +8,8 @@
     >
       {{ offer.title }}
       <span v-if="alreadyExpired"> [Expired]</span>
+      <span class="text-success" v-if="applied"> [Applied]</span>
+      <span class="text-danger" v-else-if="rejected"> [Rejected]</span>
     </h4>
     <div class="__offer-details">
       <div class="d-flex flex-row justify-content-between">
@@ -88,15 +90,16 @@
 </template>
 
 <script>
-import formatDistanceToNow from 'date-fns/formatDistanceToNow';
-import { sub } from 'date-fns';
+import { sub, formatDistanceToNow } from 'date-fns';
 import isBefore from 'date-fns/isBefore';
 export default {
   props: {
     offer: {
       type: Object,
       required: true
-    }
+    },
+    applied: Boolean,
+    rejected: Boolean
   },
   computed: {
     expirationTime() {

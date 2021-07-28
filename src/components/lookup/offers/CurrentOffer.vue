@@ -26,7 +26,13 @@
 
       <app-no-new-offers v-if="haveSeenAllNeOffers"></app-no-new-offers>
 
-      <app-offer :offer="offer" v-if="offer" class="mb-5"></app-offer>
+      <app-offer
+        class="mb-5"
+        :offer="offer"
+        v-if="offer"
+        :applied="applied"
+        :rejected="rejected"
+      ></app-offer>
 
       <app-current-offer-actions
         :disabled="!offer || loading || error !== null"
@@ -39,6 +45,10 @@
         :rejectOffer="rejectOffer"
         :nextOffer="skipOffer"
         :disabledNext="nextOfferId === null"
+        :actionResult="actionResultMsg"
+        :dismissActionResultAlert="dismissActionResultAlert"
+        :applied="applied"
+        :rejected="rejected"
       ></app-current-offer-actions>
     </div>
   </div>
@@ -62,7 +72,8 @@ export default {
     return {
       applying: false,
       rejecting: false,
-      actionError: null
+      actionError: null,
+      actionResultMsg: null
     };
   },
   computed: {
@@ -71,7 +82,21 @@ export default {
       loading: (state) => state.lookup.fetchingCurrentOffer,
       error: (state) => state.lookup.fetchCurrentOfferError,
       nextOfferId: (state) => state.lookup.nextOfferId,
-      haveSeenAllNeOffers: (state) => state.lookup.haveSeenAllNeOffers
+      haveSeenAllNeOffers: (state) => state.lookup.haveSeenAllNeOffers,
+      applied: (state) => {
+        return (
+          state.lookup.currentOffer &&
+          (state.lookup.currentOffer.appliedAt ||
+            state.lookup.appliedOffers.includes(state.lookup.currentOffer.id))
+        );
+      },
+      rejected: (state) => {
+        return (
+          state.lookup.currentOffer &&
+          (state.lookup.currentOffer.rejectedAt ||
+            state.lookup.rejectedOffers.includes(state.lookup.currentOffer.id))
+        );
+      }
     })
   },
   watch: {
@@ -96,23 +121,30 @@ export default {
     },
 
     async rejectOffer() {
+      this.actionResultMsg = null;
       this.rejecting = true;
+
       try {
         await this.$store.dispatch('rejectOffer', this.offer.id);
+        this.setActionResultMsg('Rejected :(', 'info');
         this.skipOffer();
       } catch (err) {
-        this.actionError = err.message;
+        this.setActionResultMsg(err.message, 'danger');
       }
       this.rejecting = false;
     },
 
     async applyToOffer() {
+      this.actionResultMsg = null;
       this.applying = true;
+
       try {
         await this.$store.dispatch('applyToOffer', this.offer.id);
+        this.setActionResultMsg('Accepted :) 👌🏼', 'success');
+
         this.skipOffer();
       } catch (err) {
-        this.actionError = err.message;
+        this.setActionResultMsg(err.message, 'danger');
       }
       this.applying = false;
     },
@@ -131,6 +163,18 @@ export default {
       if (id) {
         this.$router.push('/lookup/' + id);
       }
+    },
+    setActionResultMsg(msg, lv) {
+      this.actionResultMsg = { msg, level: lv };
+      this.actionSuccessMsgTimeout = setTimeout(
+        this.dismissActionResultAlert,
+        3000
+      );
+    },
+    dismissActionResultAlert() {
+      clearTimeout(this.actionSuccessMsgTimeout);
+      delete this.actionSuccessMsgTimeout;
+      this.actionResultMsg = null;
     }
   },
   created() {
