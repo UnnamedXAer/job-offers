@@ -81,6 +81,7 @@ export default {
       this.markOfferAsSeen(value);
     },
     '$route.params.id'(value) {
+      this.$store.commit('setCurrentOfferId', value);
       this.$store.dispatch('getCurrentOffer', value);
     }
   },
@@ -125,13 +126,18 @@ export default {
     },
     skipOffer() {
       if (this.nextOfferId) {
-        this.$router.push('/lookup/' + this.nextOfferId);
+        this.openOffer(this.nextOfferId);
         return;
       }
 
       this.$store.dispatch('fetchNextOffers').then(() => {
-        this.$router.push('/lookup/' + this.nextOfferId);
+        this.openOffer(this.nextOfferId);
       });
+    },
+    openOffer(id) {
+      if (id) {
+        this.$router.push('/lookup/' + id);
+      }
     }
   },
   created() {
@@ -141,9 +147,7 @@ export default {
     ) {
       return this.$store
         .dispatch('fetchCurrentOffer', id)
-        .then(() =>
-          this.$store.dispatch('setNextOfferId', this.$route.params.id)
-        );
+        .then(() => this.$store.dispatch('setNextOfferId'));
     }
     this.$store.dispatch('getCurrentOffer', id);
   },

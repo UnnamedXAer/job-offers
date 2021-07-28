@@ -24,6 +24,7 @@ export const lookupStore = {
     fetchingCurrentOffer: false,
     fetchCurrentOfferError: null,
     currentOffer: null,
+    currentOfferId: null, // for set next offer purposes
     nextOfferId: null,
     seenOffers: [],
     appliedOffers: [],
@@ -32,6 +33,9 @@ export const lookupStore = {
   }),
 
   mutations: {
+    setCurrentOfferId(state, id) {
+      state.currentOfferId = id;
+    },
     fetchCurrentOfferStart(state) {
       state.fetchCurrentOfferError = null;
       state.fetchingCurrentOffer = true;
@@ -82,12 +86,11 @@ export const lookupStore = {
   actions: {
     async getCurrentOffer({ dispatch, commit, state }, id) {
       if (state.currentOffer && state.currentOffer.id === id) {
-        console.log('current offer already set');
         return;
       }
 
       const offer = state.nextOffers.find(x => x.id === id);
-      await dispatch('setNextOfferId', id);
+      await dispatch('setNextOfferId');
       if (offer) {
         commit('fetchCurrentOfferSuccess', offer);
         return;
@@ -105,14 +108,14 @@ export const lookupStore = {
 
       try {
         const offer = await fetchOffer(id);
-        console.log('fetched current offer');
         commit('fetchCurrentOfferSuccess', offer);
       } catch (err) {
         commit('fetchCurrentOfferFail', err.message);
       }
     },
 
-    async setNextOfferId({ commit, dispatch, state }, currentOfferId) {
+    async setNextOfferId({ commit, dispatch, state }) {
+      const currentOfferId = state.currentOfferId;
       if (state.nextOfferId && currentOfferId !== state.nextOfferId) {
         console.log('unnecessary call to set next offer id');
         return;
@@ -145,17 +148,13 @@ export const lookupStore = {
           lookupConfig.nextOffersBatchSize,
           state.nextOffersOffset
         );
-        console.log('fetched Offers: ', offers.length);
+
         commit('fetchNextOffersSuccess', offers);
         if (
           !state.nextOfferId ||
           (state.currentOffer && state.currentOffer.id === state.nextOfferId)
         ) {
-          console.log('about to update next');
-          await dispatch(
-            'setNextOfferId',
-            state.currentOffer && state.currentOffer.id
-          );
+          await dispatch('setNextOfferId');
         }
       } catch (err) {
         commit('fetchNextOffersFail', err.message);
