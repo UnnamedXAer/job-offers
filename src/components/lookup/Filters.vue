@@ -107,11 +107,8 @@ export default {
   },
   methods: {
     search() {
-      console.log(this.form);
-
-      this.$store.dispatch('fetchNextOffers', {
-        ...this.form
-      });
+      this.$store.commit('setFilters', { ...this.form });
+      this.$store.dispatch('fetchNextOffers');
     },
     async getCurrentLocation() {
       getCurrentLocation()

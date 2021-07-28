@@ -77,6 +77,12 @@ export default {
     })
   },
   watch: {
+    error(value) {
+      console.log('------- eerr', value);
+    },
+    loading(val) {
+      console.log('watch, loading', val);
+    },
     offer(value) {
       this.markOfferAsSeen(value);
     },
@@ -104,6 +110,7 @@ export default {
         this.$store.dispatch('markOfferSeen', id);
       }, 1000);
     },
+
     async rejectOffer() {
       this.rejecting = true;
       try {
@@ -114,6 +121,7 @@ export default {
       }
       this.rejecting = false;
     },
+
     async applyToOffer() {
       this.applying = true;
       try {
@@ -124,6 +132,7 @@ export default {
       }
       this.applying = false;
     },
+
     skipOffer() {
       if (this.nextOfferId) {
         this.openOffer(this.nextOfferId);

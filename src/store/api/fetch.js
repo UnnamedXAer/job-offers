@@ -5,7 +5,9 @@ import { mapApiDataToOffer, mapApiDataToOffers } from '../../helpers/api';
 export const fetchOffer = async id => {
   try {
     const { data } = await firebaseAxios.get(`/offers/${id}.json`);
-
+    if (!data) {
+      throw new Error('offer does not exist');
+    }
     data.company = mockedCompanies.find(x => x.id === data.company);
 
     return mapApiDataToOffer(id, data);

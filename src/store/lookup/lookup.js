@@ -17,6 +17,7 @@ export const lookupStore = {
     recommended: lookupRecommendedOffersStore
   },
   state: () => ({
+    filters: null,
     nextOffersOffset: 0,
     fetchingNextOffers: false,
     fetchingNextOffersError: null,
@@ -68,6 +69,7 @@ export const lookupStore = {
     fetchNextOffersFail(state, errorMsg) {
       state.nextOffersOffset -= lookupConfig.nextOffersBatchSize;
       state.fetchNextOffersError = errorMsg;
+      state.fetchingNextOffers = false;
     },
     setNextOfferId(state, id) {
       state.nextOfferId = id;
@@ -80,6 +82,9 @@ export const lookupStore = {
     },
     setOfferRejected(state, { id }) {
       state.rejectedOffers = state.rejectedOffers.concat(id);
+    },
+    setFilters(state, filters) {
+      state.filters = filters;
     }
   },
 
@@ -135,7 +140,7 @@ export const lookupStore = {
       await dispatch('fetchNextOffers');
     },
 
-    async fetchNextOffers({ commit, dispatch, state }, filters) {
+    async fetchNextOffers({ commit, dispatch, state }) {
       if (state.fetchingNextOffers) {
         console.log('----- ALREADY fetching next offers');
         return;
@@ -148,7 +153,6 @@ export const lookupStore = {
           lookupConfig.nextOffersBatchSize,
           state.nextOffersOffset
         );
-
         commit('fetchNextOffersSuccess', offers);
         if (
           !state.nextOfferId ||
@@ -170,6 +174,7 @@ export const lookupStore = {
         /* nothing to do here, error is not important that much to display it */
       }
     },
+
     async applyToOffer({ commit }, id) {
       const now = new Date();
       try {
