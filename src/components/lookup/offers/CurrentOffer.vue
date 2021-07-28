@@ -1,6 +1,7 @@
 <template>
   <div id="current-offer" class="d-flex flex-column mb-5">
-    <app-error v-if="error">{{ error }}</app-error>
+    <app-error v-if="error" class="mt-3">{{ error }}</app-error>
+
     <div>
       <div
         v-if="loading"
@@ -22,9 +23,6 @@
           <span class="visually-hidden">Loading...</span>
         </div>
       </div>
-
-      <h4>current ID: {{ offer && offer.id }}</h4>
-      <h4>next ID: {{ nextOfferId }}</h4>
 
       <app-no-new-offers v-if="haveSeenAllNeOffers"></app-no-new-offers>
 
@@ -77,12 +75,6 @@ export default {
     })
   },
   watch: {
-    error(value) {
-      console.log('------- eerr', value);
-    },
-    loading(val) {
-      console.log('watch, loading', val);
-    },
     offer(value) {
       this.markOfferAsSeen(value);
     },
@@ -99,14 +91,6 @@ export default {
       }
       const id = offer.id;
       this.markSeenTimeout = setTimeout(() => {
-        if (!this.offer || this.offer.id !== id) {
-          console.warn(
-            'maker offer as seen: difference in ids',
-            id,
-            this.offer.id
-          );
-        }
-
         this.$store.dispatch('markOfferSeen', id);
       }, 1000);
     },
