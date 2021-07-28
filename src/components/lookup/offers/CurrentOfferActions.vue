@@ -37,7 +37,7 @@
       <button
         class="btn btn-warning mx-2"
         style="min-width: 90px"
-        :disabled="disabled || rejecting || applying"
+        :disabled="disabled || rejecting || applying || disabledNext"
         @click="nextOffer"
       >
         Later
@@ -84,7 +84,8 @@ export default {
       required: true
     },
     appliedAt: Date,
-    rejectedAt: Date
+    rejectedAt: Date,
+    disabledNext: Boolean
   }
 };
 </script>

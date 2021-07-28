@@ -40,7 +40,7 @@
         :applyToOffer="applyToOffer"
         :rejectOffer="rejectOffer"
         :nextOffer="skipOffer"
-        :disabledNext="1"
+        :disabledNext="nextOfferId === null"
       ></app-current-offer-actions>
     </div>
   </div>
