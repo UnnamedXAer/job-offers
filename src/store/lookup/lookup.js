@@ -50,6 +50,7 @@ export const lookupStore = {
     },
     fetchCurrentOfferFail(state, errorMsg) {
       state.fetchCurrentOfferError = errorMsg;
+      state.fetchingCurrentOffer = false;
     },
     fetchNextOffersStart(state) {
       state.nextOffersOffset += lookupConfig.nextOffersBatchSize;
