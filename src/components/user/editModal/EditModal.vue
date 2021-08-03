@@ -1,10 +1,10 @@
 <template>
   <div
     class="modal fade"
-    :class="{ show: !!fieldName }"
-    :style="{ display: fieldName ? 'block' : 'none' }"
+    :class="{ show: !!editedField }"
+    :style="{ display: editedField ? 'block' : 'none' }"
     tabindex="-1"
-    :aria-modal="!!fieldName"
+    :aria-modal="!!editedField"
     aria-labelledby="editModalTitle"
     id="EditModal"
     role="dialog"
@@ -13,7 +13,9 @@
       <div class="modal-content">
         <!--  -->
         <div class="modal-header">
-          <h5 class="modal-title" id="editModalTitle">Edit {{ fieldName }}</h5>
+          <h5 class="modal-title" id="editModalTitle" v-if="editedField">
+            Edit {{ editedField.fieldName }}
+          </h5>
           <button
             type="button"
             class="btn-close"
@@ -26,7 +28,7 @@
         <div class="modal-body">
           <component
             :is="currentFormComponent"
-            :fieldName="fieldName"
+            :editedField="editedField"
           ></component>
         </div>
         <!--  -->
@@ -54,18 +56,19 @@ export default {
     appEditHobby: HobbyFormVue
   },
   props: {
-    fieldName: {
-      type: String
+    editedField: {
+      type: Object
     }
   },
 
   computed: {
     currentFormComponent() {
-      switch (this.fieldName) {
+      if (!this.editedField) {
+        return null;
+      }
+      switch (this.editedField.fieldName) {
         case 'educations':
           return 'app-edit-education';
-      }
-      switch (this.fieldName) {
         case 'hobbies':
           return 'app-edit-hobby';
       }

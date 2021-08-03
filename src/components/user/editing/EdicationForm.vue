@@ -44,7 +44,7 @@ import { createFormValues } from '../../../helpers/createFormValues';
 export default {
   name: 'EducationForm',
   props: {
-    fieldName: null
+    editedField: null
   },
   data() {
     return {
@@ -54,8 +54,15 @@ export default {
     };
   },
   created() {
+    if (!this.editedField) {
+      return null;
+    }
+
     this.form = createFormValues(
-      this.$store.state.auth.userDetails[this.fieldName]
+      // eslint-disable-next-line
+      this.$store.state.auth.userDetails[this.editedField.fieldName][
+        this.editedField.idx
+      ]
     );
   }
 };

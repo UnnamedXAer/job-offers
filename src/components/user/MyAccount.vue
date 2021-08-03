@@ -1,7 +1,7 @@
 <template>
   <div>
     <app-edit-modal
-      :fieldName="fieldName"
+      :editedField="editedField"
       @cancel="clearEditing"
       @save="saveField"
     >
@@ -72,7 +72,7 @@
               v-for="(know, idx) in userDetails.knowledge"
               :key="idx"
             >
-              <button class="__pen" @click="edit('educations', idx)">
+              <button class="__pen" @click="edit('knowledge', idx)">
                 <i class="bi bi-pen"></i>
               </button>
               {{ know.name }} <small v-if="know.lv">{{ know.lv }}</small>
@@ -90,7 +90,7 @@
               v-for="(exp, idx) in userDetails.experience"
               :key="idx"
             >
-              <button class="__pen" @click="edit('educations', idx)">
+              <button class="__pen" @click="edit('experience', idx)">
                 <i class="bi bi-pen"></i>
               </button>
               <h6>{{ exp.companyName }}</h6>
@@ -116,7 +116,7 @@
               v-for="(hobby, idx) in userDetails.hobbies"
               :key="idx"
             >
-              <button class="__pen" @click="edit('educations', idx)">
+              <button class="__pen" @click="edit('hobbies', idx)">
                 <i class="bi bi-pen"></i>
               </button>
               {{ hobby }}
@@ -142,7 +142,7 @@ export default {
   },
   data() {
     return {
-      fieldName: null
+      editedField: null
     };
   },
   computed: {
@@ -161,14 +161,12 @@ export default {
   },
   methods: {
     edit(fieldName, idx) {
-      this.fieldName = fieldName;
+      this.editedField = { fieldName, idx };
     },
     clearEditing() {
-      this.fieldName = null;
-      this.fieldForm = null;
+      this.editedField = null;
     },
     saveField() {
-      console.log(this.fieldName, this.fieldForm);
       this.clearEditing();
     }
   },

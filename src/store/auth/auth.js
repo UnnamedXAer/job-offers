@@ -1,7 +1,10 @@
 import axios from 'axios';
+import { editUserDetailsStore } from './editUserDetails';
 
 /** @type {import('vuex').StoreOptions} */
 export const authStore = {
+  modules: { editUserDetails: editUserDetailsStore },
+
   state: () => ({
     user: null,
     error: null,
