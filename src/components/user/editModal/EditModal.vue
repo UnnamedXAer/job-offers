@@ -29,7 +29,9 @@
           <component
             :is="currentFormComponent"
             :editedField="editedField"
+            :label="simpleFormInputlabel"
           ></component>
+          <app-error v-if="error">{{ error }}</app-error>
         </div>
         <!--  -->
         <div class="modal-footer">
@@ -47,13 +49,18 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import ErrorVue from '../../ui/alerts/Error.vue';
 import EdicationFormVue from '../editing/EdicationForm.vue';
-import HobbyFormVue from '../editing/HobbyForm.vue';
+import KnowledgeFormVue from '../editing/KnowledgeForm.vue';
+import SimpleValueFormVue from '../editing/SimpleValueForm.vue';
 export default {
   name: 'EditModal',
   components: {
     appEditEducation: EdicationFormVue,
-    appEditHobby: HobbyFormVue
+    appEditKnowledge: KnowledgeFormVue,
+    appEditSimpleValue: SimpleValueFormVue,
+    appError: ErrorVue
   },
   props: {
     editedField: {
@@ -62,6 +69,10 @@ export default {
   },
 
   computed: {
+    ...mapState({
+      loading: (state) => state.auth.editUserDetails.loading,
+      error: (state) => state.auth.editUserDetails.error
+    }),
     currentFormComponent() {
       if (!this.editedField) {
         return null;
@@ -69,8 +80,22 @@ export default {
       switch (this.editedField.fieldName) {
         case 'educations':
           return 'app-edit-education';
+        case 'expirience':
+          return null;
+        case 'knowledge':
+          return 'app-edit-knowledge';
         case 'hobbies':
-          return 'app-edit-hobby';
+          return 'app-edit-simple-value';
+      }
+      return null;
+    },
+    simpleFormInputlabel() {
+      if (!this.editedField) {
+        return null;
+      }
+      switch (this.editedField.fieldName) {
+        case 'hobbies':
+          return 'Hobby';
       }
       return null;
     }

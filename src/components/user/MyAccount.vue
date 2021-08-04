@@ -93,7 +93,7 @@
               <button class="__pen" @click="edit('experience', idx)">
                 <i class="bi bi-pen"></i>
               </button>
-              <h6>{{ exp.companyName }}</h6>
+              <h6>{{ exp.company }}</h6>
               <p style="margin-block-end: 0">
                 {{ exp.position }}
               </p>
@@ -140,34 +140,31 @@ export default {
   components: {
     appEditModal: EditModalVue
   },
-  data() {
-    return {
-      editedField: null
-    };
-  },
   computed: {
     ...mapState({
       user: (state) => state.auth.user,
-      userDetails: (state) => state.auth.userDetails
+      userDetails: (state) => state.auth.userDetails,
+      editedField: (state) => state.auth.editUserDetails.editedField
     })
   },
   filters: {
     format: (val) => {
-      if (!val || val === 'current') {
-        return 'current';
+      if (val instanceof Date) {
+        return format(val, 'yyyy-MM-dd');
       }
-      return format(val, 'yyyy-MM-dd');
+
+      return val;
     }
   },
   methods: {
     edit(fieldName, idx) {
-      this.editedField = { fieldName, idx };
+      this.$store.dispatch('setUserDetailEditedField', { fieldName, idx });
     },
     clearEditing() {
-      this.editedField = null;
+      this.$store.dispatch('setUserDetailEditedField', null);
     },
-    saveField() {
-      this.clearEditing();
+    async saveField() {
+      await this.$store.dispatch('saveUserDetailForm');
     }
   },
   created() {

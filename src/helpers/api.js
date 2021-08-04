@@ -54,3 +54,14 @@ export function mapApiDataToOffer(
     rejected: Math.ceil(Math.random() * 30)
   };
 }
+
+function mapUserPropWithStartEndDate(records) {
+  return records.map(x => ({
+    ...x,
+    start: new Date(x.start),
+    end: x.end === 'current' ? x.end : new Date(x.end)
+  }));
+}
+
+export const mapUserExperienceProp = mapUserPropWithStartEndDate;
+export const mapUseEducationProp = mapUserPropWithStartEndDate;

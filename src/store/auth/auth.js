@@ -1,5 +1,9 @@
 import axios from 'axios';
 import { editUserDetailsStore } from './editUserDetails';
+import {
+  mapUserExperienceProp,
+  mapUseEducationProp
+} from '../../helpers/api.js';
 
 /** @type {import('vuex').StoreOptions} */
 export const authStore = {
@@ -29,6 +33,19 @@ export const authStore = {
     },
     fetchLoggedUserDetailsFail(state, errMsg) {
       state.fetchUserDetailsError = errMsg;
+    },
+    setUserDetailsPropValue(state, { value, key }) {
+      if (typeof state.userDetails[key] !== 'object') {
+        state.userDetails[key] = value;
+        return;
+      }
+
+      if (Array.isArray(state.userDetails[key])) {
+        state.userDetails[key] = [...value];
+        return;
+      }
+
+      state.userDetails[key] = { ...value };
     }
   },
 
@@ -51,17 +68,9 @@ export const authStore = {
         );
         const { userData } = data;
         const userDetails = {
-          educations: userData.educations.map(x => ({
-            ...x,
-            start: new Date(x.start),
-            end: x.end === 'current' ? x.end : new Date(x.end)
-          })),
+          educations: mapUseEducationProp(userData.educations),
           knowledge: [...userData.knowledge],
-          experience: userData.experience.map(x => ({
-            ...x,
-            start: new Date(x.start),
-            end: x.end === 'current' ? x.end : new Date(x.end)
-          })),
+          experience: mapUserExperienceProp(userData.experience),
           hobbies: [...userData.hobbies]
         };
 
