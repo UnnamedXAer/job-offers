@@ -43,10 +43,10 @@
           <ul>
             <li
               class="card-text __record"
-              v-for="(edu, idx) in userDetails.educations"
+              v-for="(edu, idx) in userDetails.education"
               :key="idx"
             >
-              <button class="__pen" @click="edit('educations', idx)">
+              <button class="__pen" @click="edit('education', idx)">
                 <i class="bi bi-pen"></i>
               </button>
               <h6>
@@ -83,7 +83,7 @@
 
       <div class="col">
         <div class="card card-body __editable_card">
-          <h5 class="card-title">Expirience</h5>
+          <h5 class="card-title">Experience</h5>
           <ul>
             <li
               class="card-text __record"

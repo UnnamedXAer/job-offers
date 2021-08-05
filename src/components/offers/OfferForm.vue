@@ -194,7 +194,7 @@
             <app-new-offer-input-list
               v-model="form.requirement"
               label="Requirements for the candidate"
-              placeholder="required expirience, knowledge of technologies, ect."
+              placeholder="required experience, knowledge of technologies, ect."
               dataName="requirement"
               :datalists="datalists.offerRequirements"
               @add-to-list="addListElement"
