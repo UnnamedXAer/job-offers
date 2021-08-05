@@ -44,3 +44,30 @@ export function createFormValues(fieldValue) {
 
   throw new Error('createFormValues: unsupported data type');
 }
+
+export function getEmptyFormValues(fieldName) {
+  switch (fieldName) {
+    case 'experience':
+      return {
+        company: '',
+        position: '',
+        start: '',
+        end: ''
+      };
+    case 'education':
+      return {
+        school: '',
+        field: '',
+        start: '',
+        end: ''
+      };
+    case 'knowledge':
+      return {
+        name: '',
+        lv: ''
+      };
+
+    case 'hobbies':
+      return '';
+  }
+}

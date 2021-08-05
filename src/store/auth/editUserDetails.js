@@ -1,5 +1,8 @@
 import { saveUserDetailsProp } from '../api/user';
-import { createFormValues } from '../../helpers/createFormValues';
+import {
+  createFormValues,
+  getEmptyFormValues
+} from '../../helpers/createFormValues';
 import { mapUseEducationProp, mapUserExperienceProp } from '../../helpers/api';
 
 /** @type {import('vuex').StoreOptions} */
@@ -50,9 +53,13 @@ export const editUserDetailsStore = {
     setUserDetailEditedField({ commit, rootState }, fieldInfo) {
       let form = null;
       if (fieldInfo !== null) {
-        form = createFormValues(
-          rootState.auth.userDetails[fieldInfo.fieldName][fieldInfo.idx]
-        );
+        if (fieldInfo.idx === -1) {
+          form = getEmptyFormValues(fieldInfo.fieldName);
+        } else {
+          form = createFormValues(
+            rootState.auth.userDetails[fieldInfo.fieldName][fieldInfo.idx]
+          );
+        }
       }
 
       commit('setUserDetailEditedField', { fieldInfo, form });
@@ -66,22 +73,15 @@ export const editUserDetailsStore = {
         );
       }
 
-      const { fieldName, idx } = state.editedField;
+      const { fieldName } = state.editedField;
 
       commit('saveUserDetailFormStart');
-      const payload = [...rootState.auth.userDetails[fieldName]];
 
-      if (typeof state.form === 'object') {
-        if (fieldName === 'experience') {
-          payload[idx] = mapUserExperienceProp(state.form);
-        } else if (fieldName === 'education') {
-          payload[idx] = mapUseEducationProp(state.form);
-        } else {
-          payload[idx] = { ...state.form };
-        }
-      } else {
-        payload[idx] = state.form;
-      }
+      const payload = getUserDetailFormSavePayload(
+        rootState.auth.userDetails[fieldName],
+        state.form,
+        state.editedField
+      );
 
       try {
         await saveUserDetailsProp(rootState.auth.user.id, fieldName, payload);
@@ -96,3 +96,25 @@ export const editUserDetailsStore = {
     }
   }
 };
+
+function getUserDetailFormSavePayload(oldValues, form, { fieldName, idx }) {
+  const payload = [...oldValues];
+
+  if (idx === -1) {
+    idx = payload.length;
+  }
+
+  if (typeof form === 'object') {
+    if (fieldName === 'experience') {
+      payload[idx] = mapUserExperienceProp(form);
+    } else if (fieldName === 'education') {
+      payload[idx] = mapUseEducationProp(form);
+    } else {
+      payload[idx] = { ...form };
+    }
+  } else {
+    payload[idx] = form;
+  }
+
+  return payload;
+}

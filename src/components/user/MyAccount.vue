@@ -60,6 +60,9 @@
               </small>
             </li>
           </ul>
+          <button class="__add" @click="add('education')">
+            <i class="bi bi-plus"></i>
+          </button>
         </div>
       </div>
 
@@ -78,6 +81,9 @@
               {{ know.name }} <small v-if="know.lv">{{ know.lv }}</small>
             </li>
           </ul>
+          <button class="__add" @click="add('knowledge')">
+            <i class="bi bi-plus"></i>
+          </button>
         </div>
       </div>
 
@@ -104,6 +110,9 @@
               </small>
             </li>
           </ul>
+          <button class="__add" @click="add('experience')">
+            <i class="bi bi-plus"></i>
+          </button>
         </div>
       </div>
 
@@ -122,6 +131,9 @@
               {{ hobby }}
             </li>
           </ul>
+          <button class="__add" @click="add('hobbies')">
+            <i class="bi bi-plus"></i>
+          </button>
         </div>
       </div>
 
@@ -157,6 +169,9 @@ export default {
     }
   },
   methods: {
+    add(fieldName) {
+      this.$store.dispatch('setUserDetailEditedField', { fieldName, idx: -1 });
+    },
     edit(fieldName, idx) {
       this.$store.dispatch('setUserDetailEditedField', { fieldName, idx });
     },
@@ -186,6 +201,21 @@ export default {
   border-radius: 50%;
 }
 
+.__add {
+  color: black;
+  opacity: 0.1;
+  font-size: 1.4em;
+}
+
+.card:hover > .__add {
+  opacity: 0.3;
+}
+
+.card:hover > .__add:hover {
+  color: unset;
+  opacity: 1;
+}
+
 .__pen {
   display: none;
   cursor: pointer;
@@ -193,6 +223,7 @@ export default {
   right: 1rem;
   top: 1rem;
 }
+
 .__record_text .__pen {
   top: 0;
 }
