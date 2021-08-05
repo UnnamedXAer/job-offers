@@ -1,5 +1,6 @@
 import { saveUserDetailsProp } from '../api/user';
 import { createFormValues } from '../../helpers/createFormValues';
+import { mapUseEducationProp, mapUserExperienceProp } from '../../helpers/api';
 
 /** @type {import('vuex').StoreOptions} */
 export const editUserDetailsStore = {
@@ -71,8 +72,13 @@ export const editUserDetailsStore = {
       const payload = [...rootState.auth.userDetails[fieldName]];
 
       if (typeof state.form === 'object') {
-        // map dates
-        payload[idx] = { ...state.form };
+        if (fieldName === 'experience') {
+          payload[idx] = mapUserExperienceProp(state.form);
+        } else if (fieldName === 'education') {
+          payload[idx] = mapUseEducationProp(state.form);
+        } else {
+          payload[idx] = { ...state.form };
+        }
       } else {
         payload[idx] = state.form;
       }

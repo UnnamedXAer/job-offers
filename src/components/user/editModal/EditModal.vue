@@ -51,14 +51,16 @@
 <script>
 import { mapState } from 'vuex';
 import ErrorVue from '../../ui/alerts/Error.vue';
-import EdicationFormVue from '../editing/EdicationForm.vue';
+import EducationFormVue from '../editing/EducationForm.vue';
+import ExperienceFormVue from '../editing/ExperienceForm.vue';
 import KnowledgeFormVue from '../editing/KnowledgeForm.vue';
 import SimpleValueFormVue from '../editing/SimpleValueForm.vue';
 export default {
   name: 'EditModal',
   components: {
-    appEditEducation: EdicationFormVue,
+    appEditEducation: EducationFormVue,
     appEditKnowledge: KnowledgeFormVue,
+    appEditExperience: ExperienceFormVue,
     appEditSimpleValue: SimpleValueFormVue,
     appError: ErrorVue
   },
@@ -78,10 +80,10 @@ export default {
         return null;
       }
       switch (this.editedField.fieldName) {
-        case 'educations':
+        case 'education':
           return 'app-edit-education';
-        case 'expirience':
-          return null;
+        case 'experience':
+          return 'app-edit-experience';
         case 'knowledge':
           return 'app-edit-knowledge';
         case 'hobbies':

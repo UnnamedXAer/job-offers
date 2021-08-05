@@ -1,38 +1,38 @@
 <template>
   <form v-if="form">
     <div class="mb-3">
-      <label for="form-expirience-company-name" class="col-form-label"
+      <label for="form-experience-company-name" class="col-form-label"
         >Company Name</label
       >
       <input
-        id="form-expirience-company-name"
+        id="form-experience-company-name"
         class="form-control"
         :value="form.company"
         @change="onChange('company', $event.target.value)"
       />
     </div>
     <div class="mb-3">
-      <label for="form-expirience-position-name" class="col-form-label"
+      <label for="form-experience-position-name" class="col-form-label"
         >Studied position</label
       >
       <input
-        id="form-expirience-position-name"
+        id="form-experience-position-name"
         class="form-control"
         :value="form.position"
         @change="onChange('position', $event.target.value)"
       />
     </div>
     <div class="mb-3">
-      <label for="form-expirience-start-time" class="input-group-text"
+      <label for="form-experience-start-time" class="input-group-text"
         >Start - End</label
       >
       <div class="input-group" style="flex-wrap: unset">
         <span class="input-group-text">from</span>
         <input
-          id="form-expirience-start-time"
+          id="form-experience-start-time"
           class="form-control"
           :value="form.start"
-          @change="onChange('start', $event.target.value, 'date')"
+          @change="onChange('start', $event.target.value)"
           type="date"
         />
         <span class="input-group-text">to</span>
@@ -48,7 +48,7 @@
           id="form-edication-end-time"
           class="form-control"
           :value="form.end"
-          @change="onChange('end', $event.target.value, 'date')"
+          @change="onChange('end', $event.target.value)"
           type="date"
           v-else
         />
@@ -59,9 +59,7 @@
             type="checkbox"
             aria-label="Set end date as ongoing"
             :checked="form.end === 'current'"
-            @change="
-              onChange('end', $event.target.checked ? 'current' : '', 'date')
-            "
+            @change="onChange('end', $event.target.checked ? 'current' : '')"
           />
         </div>
       </div>
@@ -72,7 +70,7 @@
 <script>
 import { mapState } from 'vuex';
 export default {
-  name: 'ExpirienceForm',
+  name: 'ExperienceForm',
   props: {
     editedField: null
   },
@@ -86,11 +84,10 @@ export default {
   },
 
   methods: {
-    onChange(key, value, type) {
+    onChange(key, value) {
       this.$store.commit('setValueUserDetailFormValue', {
         value,
-        key,
-        type
+        key
       });
     }
   }

@@ -68,9 +68,9 @@ export const authStore = {
         );
         const { userData } = data;
         const userDetails = {
-          educations: mapUseEducationProp(userData.educations),
+          education: userData.education.map(mapUseEducationProp),
           knowledge: [...userData.knowledge],
-          experience: mapUserExperienceProp(userData.experience),
+          experience: userData.experience.map(mapUserExperienceProp),
           hobbies: [...userData.hobbies]
         };
 

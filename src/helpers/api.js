@@ -55,12 +55,12 @@ export function mapApiDataToOffer(
   };
 }
 
-function mapUserPropWithStartEndDate(records) {
-  return records.map(x => ({
-    ...x,
-    start: new Date(x.start),
-    end: x.end === 'current' ? x.end : new Date(x.end)
-  }));
+function mapUserPropWithStartEndDate(record) {
+  return {
+    ...record,
+    start: new Date(record.start),
+    end: record.end === 'current' ? record.end : new Date(record.end)
+  };
 }
 
 export const mapUserExperienceProp = mapUserPropWithStartEndDate;
