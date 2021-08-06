@@ -32,7 +32,7 @@ export default {
 
   methods: {
     onChange(key, value) {
-      this.$store.commit('setValueUserDetailFormValue', {
+      this.$store.commit('setUserDetailFormValue', {
         value,
         key
       });

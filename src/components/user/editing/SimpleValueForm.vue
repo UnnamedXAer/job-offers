@@ -34,7 +34,7 @@ export default {
   methods: {
     onChange(ev) {
       console.log(ev.target.value);
-      this.$store.commit('setValueUserDetailFormValue', {
+      this.$store.commit('setUserDetailFormValue', {
         value: ev.target.value
       });
     }

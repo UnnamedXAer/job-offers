@@ -1,9 +1,7 @@
 import { saveUserDetailsProp } from '../api/user';
-import {
-  createFormValues,
-  getEmptyFormValues
-} from '../../helpers/createFormValues';
+import { createFormValues } from '../../helpers/createFormValues';
 import { mapUseEducationProp, mapUserExperienceProp } from '../../helpers/api';
+import { validateUserDetailProp } from '../../validation/userDetailsValidation';
 
 /** @type {import('vuex').StoreOptions} */
 export const editUserDetailsStore = {
@@ -11,16 +9,24 @@ export const editUserDetailsStore = {
     editedField: null,
     form: null,
     error: null,
-    loading: false
+    loading: false,
+    errors: {},
+    touched: {}
   }),
 
   mutations: {
-    setUserDetailEditedField(state, { fieldInfo, form }) {
+    setUserDetailEditedField(
+      state,
+      { fieldInfo, form, formErrors, formTouches }
+    ) {
       state.editedField = fieldInfo;
       state.form = form;
+      state.error = null;
+      state.errors = formErrors;
+      state.touched = formTouches;
     },
 
-    setValueUserDetailFormValue(state, { key, value, type }) {
+    setUserDetailFormValue(state, { key, value, type }) {
       if (type === 'date' && type !== 'current') {
         value = new Date(value);
       }
@@ -32,6 +38,11 @@ export const editUserDetailsStore = {
       state.form = value;
     },
 
+    setUserDetailFormError(state, { error, key }) {
+      state.touched[key] = true;
+      state.errors[key] = error;
+    },
+
     saveUserDetailFormStart(state) {
       state.loading = true;
       state.error = null;
@@ -40,6 +51,8 @@ export const editUserDetailsStore = {
       state.loading = false;
       state.error = null;
       state.form = null;
+      state.errors = null;
+      state.touched = null;
 
       state.editedField = null;
     },
@@ -50,19 +63,31 @@ export const editUserDetailsStore = {
   },
 
   actions: {
-    setUserDetailEditedField({ commit, rootState }, fieldInfo) {
-      let form = null;
-      if (fieldInfo !== null) {
-        if (fieldInfo.idx === -1) {
-          form = getEmptyFormValues(fieldInfo.fieldName);
-        } else {
-          form = createFormValues(
-            rootState.auth.userDetails[fieldInfo.fieldName][fieldInfo.idx]
-          );
-        }
-      }
+    setUserDetailFormValue({ commit }, payload) {
+      commit('setUserDetailFormValue', payload);
+    },
 
-      commit('setUserDetailEditedField', { fieldInfo, form });
+    validateUserDetailForm({ commit, state }, { key }) {
+      const error = validateUserDetailProp(
+        state.form,
+        state.editedField.fieldName,
+        key
+      );
+      commit('setUserDetailFormError', { key, error });
+    },
+
+    setUserDetailEditedField({ commit, rootState }, fieldInfo) {
+      const { form, formErrors, formTouches } = createFormValues(
+        rootState.auth.userDetails,
+        fieldInfo
+      );
+
+      commit('setUserDetailEditedField', {
+        fieldInfo,
+        form,
+        formErrors,
+        formTouches
+      });
     },
 
     async saveUserDetailForm({ commit, rootState, state }) {

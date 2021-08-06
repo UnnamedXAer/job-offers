@@ -1,6 +1,47 @@
 import { format } from 'date-fns';
+import { validateUserDetailProp } from '../validation/userDetailsValidation';
 
-export function createFormValues(fieldValue) {
+export function createFormValues(userDetails, fieldInfo) {
+  let form = null;
+  let isNew = false;
+  let formErrors = null;
+  let formTouches = false;
+
+  if (fieldInfo !== null) {
+    if (fieldInfo.idx === -1) {
+      isNew = true;
+      form = crateEmptyForm(fieldInfo.fieldName);
+    } else {
+      form = createFormWithValues(
+        userDetails[fieldInfo.fieldName][fieldInfo.idx]
+      );
+    }
+
+    if (typeof form === 'object') {
+      formErrors = {};
+      formTouches = {};
+      for (const key in form) {
+        formErrors[key] = isNew
+          ? null
+          : validateUserDetailProp(form, fieldInfo.fieldName, key);
+        formTouches[key] = !isNew;
+      }
+    } else {
+      formErrors = isNew
+        ? null
+        : validateUserDetailProp(form, fieldInfo.fieldName, 'simpleValue');
+      formTouches = !isNew;
+    }
+  }
+
+  return {
+    form,
+    formErrors,
+    formTouches
+  };
+}
+
+function createFormWithValues(fieldValue) {
   switch (typeof fieldValue) {
     case 'number':
       return Number(fieldValue);
@@ -42,10 +83,10 @@ export function createFormValues(fieldValue) {
       return undefined;
   }
 
-  throw new Error('createFormValues: unsupported data type');
+  throw new Error('user details: create form values: unsupported data type');
 }
 
-export function getEmptyFormValues(fieldName) {
+function crateEmptyForm(fieldName) {
   switch (fieldName) {
     case 'experience':
       return {
@@ -70,4 +111,6 @@ export function getEmptyFormValues(fieldName) {
     case 'hobbies':
       return '';
   }
+
+  throw new Error('user details: create empty form: unknown property');
 }
