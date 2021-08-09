@@ -2,10 +2,12 @@ const errors = {
   e1000: 'This field is required.',
   e1100: 'Text cannot exceed $0 characters.',
   e1101: 'Too many positions, please reduce to $0.',
-  e1200: 'The $0, cannot be greater than $1.',
+  e1200: '$0 start range value cannot be greater than end ($1).',
   e1201: '$0 end range value cannot be less than start ($1).',
   e1202: 'The $0 cannot be less than $1.',
   e1203: 'The $0 cannot be earlier than $1',
+  e1204: 'The $0, cannot be greater than $1.',
+  e1205: 'The $0, cannot be later than $1.',
   e1300: 'Negative values are not acceptable.'
 };
 

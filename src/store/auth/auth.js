@@ -2,7 +2,7 @@ import axios from 'axios';
 import { editUserDetailsStore } from './editUserDetails';
 import {
   mapUserExperienceProp,
-  mapUseEducationProp
+  mapUserEducationProp
 } from '../../helpers/api.js';
 
 /** @type {import('vuex').StoreOptions} */
@@ -14,7 +14,8 @@ export const authStore = {
     error: null,
     loading: false,
     userDetails: null,
-    fetchingUserDetails: false
+    fetchingUserDetails: false,
+    fetchUserDetailsError: null
   }),
 
   mutations: {
@@ -68,7 +69,7 @@ export const authStore = {
         );
         const { userData } = data;
         const userDetails = {
-          education: userData.education.map(mapUseEducationProp),
+          education: userData.education.map(mapUserEducationProp),
           knowledge: [...userData.knowledge],
           experience: userData.experience.map(mapUserExperienceProp),
           hobbies: [...userData.hobbies]

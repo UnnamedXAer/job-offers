@@ -1,6 +1,6 @@
 import { saveUserDetailsProp } from '../api/user';
 import { createFormValues } from '../../helpers/createFormValues';
-import { mapUseEducationProp, mapUserExperienceProp } from '../../helpers/api';
+import { mapUserEducationProp, mapUserExperienceProp } from '../../helpers/api';
 import { validateUserDetailProp } from '../../validation/userDetailsValidation';
 
 /** @type {import('vuex').StoreOptions} */
@@ -19,9 +19,9 @@ export const editUserDetailsStore = {
       state,
       { fieldInfo, form, formErrors, formTouches }
     ) {
+      state.error = null;
       state.editedField = fieldInfo;
       state.form = form;
-      state.error = null;
       state.errors = formErrors;
       state.touched = formTouches;
     },
@@ -41,6 +41,10 @@ export const editUserDetailsStore = {
     setUserDetailFormError(state, { error, key }) {
       state.touched[key] = true;
       state.errors[key] = error;
+
+      if (error === null) {
+        state.error = null;
+      }
     },
 
     saveUserDetailFormStart(state) {
@@ -67,6 +71,17 @@ export const editUserDetailsStore = {
       commit('setUserDetailFormValue', payload);
     },
 
+    validateUserDetailFormAll({ dispatch, state }) {
+      if (typeof state.form !== 'object') {
+        dispatch('validateUserDetailForm', { key: 'simpleValue' });
+        return;
+      }
+
+      for (const key in state.form) {
+        dispatch('validateUserDetailForm', { key });
+      }
+    },
+
     validateUserDetailForm({ commit, state }, { key }) {
       const error = validateUserDetailProp(
         state.form,
@@ -74,6 +89,25 @@ export const editUserDetailsStore = {
         key
       );
       commit('setUserDetailFormError', { key, error });
+
+      if (key === 'start' && state.touched.end) {
+        const error = validateUserDetailProp(
+          state.form,
+          state.editedField.fieldName,
+          'end'
+        );
+        commit('setUserDetailFormError', { key: 'end', error });
+        return;
+      }
+
+      if (key === 'end' && state.touched.start) {
+        const error = validateUserDetailProp(
+          state.form,
+          state.editedField.fieldName,
+          'start'
+        );
+        commit('setUserDetailFormError', { key: 'start', error });
+      }
     },
 
     setUserDetailEditedField({ commit, rootState }, fieldInfo) {
@@ -83,14 +117,14 @@ export const editUserDetailsStore = {
       );
 
       commit('setUserDetailEditedField', {
-        fieldInfo,
+        fieldInfo: fieldInfo ? { ...fieldInfo } : null,
         form,
         formErrors,
         formTouches
       });
     },
 
-    async saveUserDetailForm({ commit, rootState, state }) {
+    async saveUserDetailForm({ commit, dispatch, rootState, state }) {
       if (state.editedField === null || state.form === null) {
         commit(
           'saveUserDetailFormFail',
@@ -100,9 +134,18 @@ export const editUserDetailsStore = {
 
       const { fieldName } = state.editedField;
 
+      dispatch('validateUserDetailFormAll');
+
+      for (const key in state.errors) {
+        if (state.errors[key] !== null) {
+          commit('saveUserDetailFormFail', 'Form has errors.');
+          return;
+        }
+      }
+
       commit('saveUserDetailFormStart');
 
-      const payload = getUserDetailFormSavePayload(
+      const payload = prepareUserDetailFormSavePayload(
         rootState.auth.userDetails[fieldName],
         state.form,
         state.editedField
@@ -122,23 +165,27 @@ export const editUserDetailsStore = {
   }
 };
 
-function getUserDetailFormSavePayload(oldValues, form, { fieldName, idx }) {
+function prepareUserDetailFormSavePayload(
+  oldValues,
+  form,
+  { fieldName, idx, isSimpleValue }
+) {
   const payload = [...oldValues];
 
   if (idx === -1) {
     idx = payload.length;
   }
 
-  if (typeof form === 'object') {
+  if (isSimpleValue) {
+    payload[idx] = form.simpleValue;
+  } else {
     if (fieldName === 'experience') {
       payload[idx] = mapUserExperienceProp(form);
     } else if (fieldName === 'education') {
-      payload[idx] = mapUseEducationProp(form);
+      payload[idx] = mapUserEducationProp(form);
     } else {
       payload[idx] = { ...form };
     }
-  } else {
-    payload[idx] = form;
   }
 
   return payload;

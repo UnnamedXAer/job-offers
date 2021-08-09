@@ -64,4 +64,4 @@ function mapUserPropWithStartEndDate(record) {
 }
 
 export const mapUserExperienceProp = mapUserPropWithStartEndDate;
-export const mapUseEducationProp = mapUserPropWithStartEndDate;
+export const mapUserEducationProp = mapUserPropWithStartEndDate;

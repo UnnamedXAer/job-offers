@@ -36,7 +36,17 @@
       </div>
     </section>
 
-    <section class="row row-cols-1 row-cols-md-2 g-4" v-if="userDetails">
+    <app-error v-if="error">{{ error }}</app-error>
+    <div
+      v-else-if="loading"
+      class="spinner-border text-primary mx-auto"
+      style="width: 3rem; height: 3rem; border-width: 0.4em; display: block"
+      role="status"
+    >
+      <span class="visually-hidden">Loading...</span>
+    </div>
+
+    <section class="row row-cols-1 row-cols-md-2 g-4" v-else-if="userDetails">
       <div class="col">
         <div class="card card-body __editable_card">
           <h5 class="card-title">Education</h5>
@@ -125,13 +135,13 @@
               v-for="(hobby, idx) in userDetails.hobbies"
               :key="idx"
             >
-              <button class="__pen" @click="edit('hobbies', idx)">
+              <button class="__pen" @click="edit('hobbies', idx, true)">
                 <i class="bi bi-pen"></i>
               </button>
               {{ hobby }}
             </li>
           </ul>
-          <button class="__add" @click="add('hobbies')">
+          <button class="__add" @click="add('hobbies', true)">
             <i class="bi bi-plus"></i>
           </button>
         </div>
@@ -146,17 +156,21 @@
 import format from 'date-fns/format';
 import { mapState } from 'vuex';
 import EditModalVue from './editModal/EditModal.vue';
+import ErrorVue from '../ui/alerts/Error.vue';
 
 export default {
   name: 'MyProfile',
   components: {
-    appEditModal: EditModalVue
+    appEditModal: EditModalVue,
+    appError: ErrorVue
   },
   computed: {
     ...mapState({
       user: (state) => state.auth.user,
       userDetails: (state) => state.auth.userDetails,
-      editedField: (state) => state.auth.editUserDetails.editedField
+      editedField: (state) => state.auth.editUserDetails.editedField,
+      loading: (state) => state.auth.fetchingUserDetails,
+      error: (state) => state.auth.fetchUserDetailsError
     })
   },
   filters: {
@@ -169,17 +183,25 @@ export default {
     }
   },
   methods: {
-    add(fieldName) {
-      this.$store.dispatch('setUserDetailEditedField', { fieldName, idx: -1 });
+    add(fieldName, isSimpleValue) {
+      this.$store.dispatch('setUserDetailEditedField', {
+        fieldName,
+        idx: -1,
+        isSimpleValue
+      });
     },
-    edit(fieldName, idx) {
-      this.$store.dispatch('setUserDetailEditedField', { fieldName, idx });
+    edit(fieldName, idx, isSimpleValue) {
+      this.$store.dispatch('setUserDetailEditedField', {
+        fieldName,
+        idx,
+        isSimpleValue
+      });
     },
     clearEditing() {
       this.$store.dispatch('setUserDetailEditedField', null);
     },
-    async saveField() {
-      await this.$store.dispatch('saveUserDetailForm');
+    saveField() {
+      this.$store.dispatch('saveUserDetailForm');
     }
   },
   created() {

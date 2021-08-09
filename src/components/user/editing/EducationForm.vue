@@ -1,5 +1,5 @@
 <template>
-  <form v-if="form">
+  <form v-if="form" @submit.prevent="$emit('form-submit')">
     <div class="mb-3">
       <label for="form-education-school-name" class="col-form-label"
         >School Name</label
@@ -19,11 +19,11 @@
       </div>
     </div>
     <div class="mb-3">
-      <label for="form-education-field-name" class="col-form-label"
+      <label for="form-education-field" class="col-form-label"
         >Studied Field</label
       >
       <input
-        id="form-education-field-name"
+        id="form-education-field"
         class="form-control"
         :class="[errors.field ? 'is-invalid' : touched.field ? 'is-valid' : '']"
         :value="form.field"
@@ -34,21 +34,18 @@
         {{ errors.field }}
       </div>
     </div>
+
+    <label for="form-education-start-time" class="col-form-label"
+      >Period Start - End</label
+    >
     <div class="mb-3">
-      <label for="form-education-start-time" class="input-group-text"
-        >Period Start - End</label
-      >
       <div class="input-group" style="flex-wrap: unset">
         <span class="input-group-text">from</span>
         <input
           id="form-education-start-time"
           class="form-control"
           :class="[
-            errors.start
-              ? 'is-invalid'
-              : touched.start
-              ? 'is-valid'
-              : ''
+            errors.start ? 'is-invalid' : touched.start ? 'is-valid' : ''
           ]"
           type="date"
           :value="form.start"
@@ -91,6 +88,7 @@
         {{ errors.start ? errors.start : errors.end }}
       </div>
     </div>
+    <input id="form-education-submit" value="Submit" type="submit" hidden />
   </form>
 </template>
 
@@ -122,13 +120,14 @@ export default {
         value,
         key
       });
+      this.$store.dispatch('validateUserDetailForm', { key });
     },
     onBlur(key) {
+      if (this.form === null) {
+        return;
+      }
       this.$store.dispatch('validateUserDetailForm', { key });
     }
   }
 };
 </script>
-
-<style scoped>
-</style>

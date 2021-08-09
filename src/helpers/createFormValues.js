@@ -17,20 +17,17 @@ export function createFormValues(userDetails, fieldInfo) {
       );
     }
 
-    if (typeof form === 'object') {
-      formErrors = {};
-      formTouches = {};
-      for (const key in form) {
-        formErrors[key] = isNew
-          ? null
-          : validateUserDetailProp(form, fieldInfo.fieldName, key);
-        formTouches[key] = !isNew;
-      }
-    } else {
-      formErrors = isNew
+    if (fieldInfo.isSimpleValue) {
+      form = { simpleValue: form };
+    }
+
+    formErrors = {};
+    formTouches = {};
+    for (const key in form) {
+      formErrors[key] = isNew
         ? null
-        : validateUserDetailProp(form, fieldInfo.fieldName, 'simpleValue');
-      formTouches = !isNew;
+        : validateUserDetailProp(form, fieldInfo.fieldName, key);
+      formTouches[key] = !isNew;
     }
   }
 
@@ -52,7 +49,7 @@ function createFormWithValues(fieldValue) {
       if (Array.isArray(fieldValue)) {
         const out = Array(fieldValue.length);
         for (let i = 0; i < fieldValue.length; i++) {
-          const element = createFormValues(fieldValue[i]);
+          const element = createFormWithValues(fieldValue[i]);
 
           out[i] = element;
         }
@@ -71,7 +68,7 @@ function createFormWithValues(fieldValue) {
       const out = {};
 
       for (const key in fieldValue) {
-        const element = createFormValues(fieldValue[key]);
+        const element = createFormWithValues(fieldValue[key]);
         out[key] = element;
       }
 

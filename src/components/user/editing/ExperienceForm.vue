@@ -1,5 +1,5 @@
 <template>
-  <form v-if="form">
+  <form v-if="form" @submit.prevent="$emit('form-submit')">
     <div class="mb-3">
       <label for="form-experience-company-name" class="col-form-label"
         >Company Name</label
@@ -42,10 +42,10 @@
         {{ errors.position }}
       </div>
     </div>
+    <label for="form-experience-start-time" class="col-form-label"
+      >Periods Start - End</label
+    >
     <div class="mb-3">
-      <label for="form-experience-start-time" class="input-group-text"
-        >Periods Start - End</label
-      >
       <div class="input-group" style="flex-wrap: unset">
         <span class="input-group-text">from</span>
         <input
@@ -95,6 +95,7 @@
         {{ errors.start ? errors.start : errors.end }}
       </div>
     </div>
+    <input id="form-experience-submit" value="Submit" type="submit" hidden />
   </form>
 </template>
 
@@ -126,6 +127,7 @@ export default {
         value,
         key
       });
+      this.$store.dispatch('validateUserDetailForm', { key });
     },
     onBlur(key) {
       this.$store.dispatch('validateUserDetailForm', { key });
@@ -133,6 +135,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-</style>

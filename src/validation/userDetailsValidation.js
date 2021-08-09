@@ -1,4 +1,4 @@
-import { isAfter } from 'date-fns';
+import { isAfter, parseISO, startOfToday } from 'date-fns';
 import { getError } from './errors.js';
 
 export function validateUserDetailProp(
@@ -63,14 +63,14 @@ function validateEducationProp(prop, fieldName) {
 }
 
 function validateHobbiesProp(prop) {
-  const error = validateTextLength(prop, 250);
+  const error = validateTextLength(prop.simpleValue, 250);
   return error;
 }
 
 function validateKnowledgeProp(prop, fieldName) {
   switch (fieldName) {
     case 'name':
-      const error = validateTextLength(prop, 250);
+      const error = validateTextLength(prop.name, 250);
       return error;
     case 'lv':
       return null;
@@ -99,15 +99,17 @@ function validateStart(startVal, endVal) {
     return getError('e1000');
   }
 
-  const start = new Date(startVal);
-  const end = new Date(endVal);
+  const start = parseISO(startVal);
+  const end = parseISO(endVal);
 
-  if (isAfter(end, start)) {
-    return getError('e1201', ['Period', start.toLocaleDateString()]);
+  if (isAfter(start, end)) {
+    return getError('e1200', ['Period', end.toLocaleDateString()]);
   }
 
-  if (isAfter(end, new Date().setHours(0, 0, 0, 0))) {
-    return getError('e1203', ['period end date', 'today']);
+  const today = startOfToday();
+
+  if (isAfter(start, today)) {
+    return getError('e1205', ['period start date', 'today']);
   }
 
   return null;
@@ -122,15 +124,17 @@ function validateEnd(startVal, endVal) {
     return getError('e1000');
   }
 
-  const start = new Date(startVal);
-  const end = new Date(endVal);
+  const start = parseISO(startVal);
+  const end = parseISO(endVal);
 
   if (isAfter(start, end)) {
     return getError('e1201', ['Period', start.toLocaleDateString()]);
   }
 
-  if (isAfter(end, new Date().setHours(0, 0, 0, 0))) {
-    return getError('e1203', ['period end date', 'today']);
+  const today = startOfToday();
+
+  if (isAfter(end, today)) {
+    return getError('e1205', ['period end date', 'today']);
   }
 
   return null;

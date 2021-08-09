@@ -22,6 +22,7 @@
             data-bs-dismiss="modal"
             aria-label="Close"
             @click="cancel"
+            :disabled="loading"
           ></button>
         </div>
         <!--  -->
@@ -30,15 +31,32 @@
             :is="currentFormComponent"
             :editedField="editedField"
             :label="simpleFormInputlabel"
+            @form-submit="submit"
           ></component>
           <app-error v-if="error">{{ error }}</app-error>
         </div>
         <!--  -->
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" @click="cancel">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            @click="cancel"
+            :disabled="loading"
+          >
             Cancel
           </button>
-          <button type="button" class="btn btn-primary" @click="submit">
+          <button
+            type="button"
+            class="btn btn-primary"
+            @click="submit"
+            :disabled="loading"
+          >
+            <span
+              class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+              v-if="loading"
+            ></span>
             Save
           </button>
         </div>
@@ -113,6 +131,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-</style>
