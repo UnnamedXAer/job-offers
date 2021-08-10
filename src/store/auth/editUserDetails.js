@@ -26,16 +26,9 @@ export const editUserDetailsStore = {
       state.touched = formTouches;
     },
 
-    setUserDetailFormValue(state, { key, value, type }) {
-      if (type === 'date' && type !== 'current') {
-        value = new Date(value);
-      }
-
-      if (key) {
-        state.form[key] = value;
-        return;
-      }
-      state.form = value;
+    setUserDetailFormValue(state, { key, value }) {
+      state.form[key] = value;
+      state.touched[key] = true;
     },
 
     setUserDetailFormError(state, { error, key }) {
