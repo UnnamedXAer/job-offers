@@ -1,6 +1,6 @@
 <template>
   <form v-if="form" @submit.prevent="$emit('form-submit')">
-    <div class="mb-3">
+    <div class="mb-3 position-relative">
       <label for="form-experience-company-name" class="col-form-label"
         >Company Name</label
       >
@@ -13,17 +13,15 @@
         :value="form.company"
         @change="onChange('company', $event.target.value)"
         @blur="onBlur('company')"
+        ref="firstElement"
       />
-      <div
-        id="form-experience-company-help-block"
-        class="form-text text-danger"
-      >
+      <app-field-error>
         {{ errors.company }}
-      </div>
+      </app-field-error>
     </div>
-    <div class="mb-3">
+    <div class="mb-3 position-relative">
       <label for="form-experience-position-name" class="col-form-label"
-        >Studied position</label
+        >Position</label
       >
       <input
         id="form-experience-position-name"
@@ -35,17 +33,14 @@
         @change="onChange('position', $event.target.value)"
         @blur="onBlur('position')"
       />
-      <div
-        id="form-experience-position-help-block"
-        class="form-text text-danger"
-      >
+      <app-field-error>
         {{ errors.position }}
-      </div>
+      </app-field-error>
     </div>
     <label for="form-experience-start-time" class="col-form-label"
       >Periods Start - End</label
     >
-    <div class="mb-3">
+    <div class="mb-3 position-relative">
       <div class="input-group" style="flex-wrap: unset">
         <span class="input-group-text">from</span>
         <input
@@ -91,47 +86,19 @@
           />
         </div>
       </div>
-      <div id="form-experience-period-help-block" class="form-text text-danger">
+      <app-field-error>
         {{ errors.start ? errors.start : errors.end }}
-      </div>
+      </app-field-error>
     </div>
     <input id="form-experience-submit" value="Submit" type="submit" hidden />
   </form>
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import MixinFormVue from './MixinForm.vue';
+
 export default {
   name: 'ExperienceForm',
-  props: {
-    editedField: null
-  },
-
-  computed: {
-    ...mapState({
-      form: (state) => {
-        return state.auth.editUserDetails.form;
-      },
-      errors: (state) => {
-        return state.auth.editUserDetails.errors;
-      },
-      touched: (state) => {
-        return state.auth.editUserDetails.touched;
-      }
-    })
-  },
-
-  methods: {
-    onChange(key, value) {
-      this.$store.dispatch('setUserDetailFormValue', {
-        value,
-        key
-      });
-      this.$store.dispatch('validateUserDetailForm', { key });
-    },
-    onBlur(key) {
-      this.$store.dispatch('validateUserDetailForm', { key });
-    }
-  }
+  mixins: [MixinFormVue]
 };
 </script>

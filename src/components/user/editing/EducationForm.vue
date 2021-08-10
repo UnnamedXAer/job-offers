@@ -1,6 +1,6 @@
 <template>
   <form v-if="form" @submit.prevent="$emit('form-submit')">
-    <div class="mb-3">
+    <div class="mb-3 position-relative">
       <label for="form-education-school-name" class="col-form-label"
         >School Name</label
       >
@@ -13,12 +13,13 @@
         :value="form.school"
         @change="onChange('school', $event.target.value)"
         @blur="onBlur('school')"
+        ref="firstElement"
       />
-      <div id="form-education-school-help-block" class="form-text text-danger">
+      <app-field-error>
         {{ errors.school }}
-      </div>
+      </app-field-error>
     </div>
-    <div class="mb-3">
+    <div class="mb-3 position-relative">
       <label for="form-education-field" class="col-form-label"
         >Studied Field</label
       >
@@ -30,15 +31,15 @@
         @change="onChange('field', $event.target.value)"
         @blur="onBlur('field')"
       />
-      <div id="form-education-field-help-block" class="form-text text-danger">
+      <app-field-error>
         {{ errors.field }}
-      </div>
+      </app-field-error>
     </div>
 
     <label for="form-education-start-time" class="col-form-label"
       >Period Start - End</label
     >
-    <div class="mb-3">
+    <div class="mb-3 position-relative">
       <div class="input-group" style="flex-wrap: unset">
         <span class="input-group-text">from</span>
         <input
@@ -84,50 +85,19 @@
           />
         </div>
       </div>
-      <div id="form-education-period-help-block" class="form-text text-danger">
+      <app-field-error>
         {{ errors.start ? errors.start : errors.end }}
-      </div>
+      </app-field-error>
     </div>
     <input id="form-education-submit" value="Submit" type="submit" hidden />
   </form>
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import MixinFormVue from './MixinForm.vue';
+
 export default {
   name: 'EducationForm',
-  props: {
-    editedField: null
-  },
-
-  computed: {
-    ...mapState({
-      form: (state) => {
-        return state.auth.editUserDetails.form;
-      },
-      errors: (state) => {
-        return state.auth.editUserDetails.errors;
-      },
-      touched: (state) => {
-        return state.auth.editUserDetails.touched;
-      }
-    })
-  },
-
-  methods: {
-    onChange(key, value) {
-      this.$store.dispatch('setUserDetailFormValue', {
-        value,
-        key
-      });
-      this.$store.dispatch('validateUserDetailForm', { key });
-    },
-    onBlur(key) {
-      if (this.form === null) {
-        return;
-      }
-      this.$store.dispatch('validateUserDetailForm', { key });
-    }
-  }
+  mixins: [MixinFormVue]
 };
 </script>

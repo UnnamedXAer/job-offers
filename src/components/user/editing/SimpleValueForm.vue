@@ -1,6 +1,6 @@
 <template>
   <form v-if="form" @submit.prevent="$emit('form-submit')">
-    <div class="mb-3">
+    <div class="mb-3 position-relative">
       <label for="form-simple-value-input" class="col-form-label">{{
         label
       }}</label>
@@ -17,48 +17,24 @@
         :value="form.simpleValue"
         @change="onChange('simpleValue', $event.target.value)"
         @blur="onBlur('simpleValue')"
+        ref="firstElement"
       />
-      <div id="form-simple-value-help-block" class="form-text text-danger">
+      <app-field-error>
         {{ errors.simpleValue }}
-      </div>
+      </app-field-error>
     </div>
     <input id="form-simple-value-submit" value="Submit" type="submit" hidden />
   </form>
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import MixinFormVue from './MixinForm.vue';
 
 export default {
+  name: 'SimpleValueForm',
+  mixins: [MixinFormVue],
   props: {
-    editedField: null,
     label: String
-  },
-
-  computed: {
-    ...mapState({
-      form: (state) => {
-        return state.auth.editUserDetails.form;
-      },
-      errors: (state) => state.auth.editUserDetails.errors,
-      touched: (state) => state.auth.editUserDetails.touched
-    })
-  },
-
-  methods: {
-    onChange(key, value) {
-      this.$store.commit('setUserDetailFormValue', {
-        value,
-        key
-      });
-      this.$store.dispatch('validateUserDetailForm', { key });
-    },
-    onBlur(key) {
-      if (this.form === null) {
-        return;
-      }
-      this.$store.dispatch('validateUserDetailForm', { key });
-    }
   }
 };
 </script>

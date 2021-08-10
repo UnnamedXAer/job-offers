@@ -1,19 +1,25 @@
 <template>
   <div
+    v-if="!!editedField"
     class="modal fade"
     :class="{ show: !!editedField }"
-    :style="{ display: editedField ? 'block' : 'none' }"
+    :style="{
+      display: editedField ? 'block' : 'none',
+      backgroundColor: 'rgba(230, 230, 230, 0.3)'
+    }"
     tabindex="-1"
     :aria-modal="!!editedField"
     aria-labelledby="editModalTitle"
     id="EditModal"
     role="dialog"
+    @click="cancel"
+    @keyup.esc="cancel"
   >
-    <div class="modal-dialog modal-fullscreen-sm-down">
+    <div class="modal-dialog modal-fullscreen-sm-down" @click.stop="">
       <div class="modal-content">
         <!--  -->
         <div class="modal-header">
-          <h5 class="modal-title" id="editModalTitle" v-if="editedField">
+          <h5 class="modal-title" id="editModalTitle">
             Edit {{ editedField.fieldName }}
           </h5>
           <button
@@ -33,7 +39,7 @@
             :label="simpleFormInputlabel"
             @form-submit="submit"
           ></component>
-          <app-error v-if="error">{{ error }}</app-error>
+          <app-error class="mt-4 mb-1" v-if="error">{{ error }}</app-error>
         </div>
         <!--  -->
         <div class="modal-footer">
