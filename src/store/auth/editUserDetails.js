@@ -3,16 +3,18 @@ import { createFormValues } from '../../helpers/createFormValues';
 import { mapUserEducationProp, mapUserExperienceProp } from '../../helpers/api';
 import { validateUserDetailProp } from '../../validation/userDetailsValidation';
 
+export const getDefaultState = () => ({
+  editedField: null,
+  form: null,
+  error: null,
+  loading: false,
+  errors: {},
+  touched: {}
+});
+
 /** @type {import('vuex').StoreOptions} */
 export const editUserDetailsStore = {
-  state: () => ({
-    editedField: null,
-    form: null,
-    error: null,
-    loading: false,
-    errors: {},
-    touched: {}
-  }),
+  state: getDefaultState,
 
   mutations: {
     setUserDetailEditedField(

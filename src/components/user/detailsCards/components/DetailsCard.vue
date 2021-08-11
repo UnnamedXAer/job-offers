@@ -1,5 +1,5 @@
 <template>
-  <div class="col">
+  <div class="col __user_details__card">
     <div class="card card-body">
       <h5 class="card-title">{{ cardTitle }}</h5>
       <ul>

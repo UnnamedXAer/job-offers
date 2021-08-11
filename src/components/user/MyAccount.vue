@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="my-profile">
     <app-edit-modal
       :editedField="editedField"
       @cancel="clearEditing"

@@ -5,18 +5,20 @@ import {
   mapUserEducationProp
 } from '../../helpers/api.js';
 
+export const getDefaultState = () => ({
+  user: null,
+  error: null,
+  loading: false,
+  userDetails: null,
+  fetchingUserDetails: false,
+  fetchUserDetailsError: null
+});
+
 /** @type {import('vuex').StoreOptions} */
 export const authStore = {
   modules: { editUserDetails: editUserDetailsStore },
 
-  state: () => ({
-    user: null,
-    error: null,
-    loading: false,
-    userDetails: null,
-    fetchingUserDetails: false,
-    fetchUserDetailsError: null
-  }),
+  state: getDefaultState,
 
   mutations: {
     setLoggedUser(state, user) {
