@@ -49,81 +49,23 @@
     <section class="row row-cols-1 row-cols-md-2 g-4" v-else-if="userDetails">
       <app-education-card></app-education-card>
       <app-experience-card></app-experience-card>
-
-      <!-- <app-details-card card-title="Knowledge" name="knowledge" @add="add">
-        <li
-          class="card-text __record __record_text"
-          v-for="(know, idx) in userDetails.knowledge"
-          :key="idx"
-        >
-          <app-record-actions
-            :idx="idx"
-            name="knowledge"
-            @remove="remove"
-            @edit="edit"
-          ></app-record-actions>
-          {{ know.name }} <small v-if="know.lv">{{ know.lv }}</small>
-        </li>
-      </app-details-card>
-
-      <app-details-card card-title="Experience" name="experience" @add="add">
-        <li
-          class="card-text __record"
-          v-for="(exp, idx) in userDetails.experience"
-          :key="idx"
-        >
-          <app-record-actions
-            :idx="idx"
-            name="experience"
-            @remove="remove"
-            @edit="edit"
-          ></app-record-actions>
-          <h6>{{ exp.company }}</h6>
-          <p style="margin-block-end: 0">
-            {{ exp.position }}
-          </p>
-          <small class="text-secondary">
-            {{ exp.start | format }} -
-            <span v-if="exp.end">{{ exp.end | format }}</span>
-            <span v-else>currently</span>
-          </small>
-        </li>
-      </app-details-card>
-
-      <app-details-card
-        card-title="Hobbies"
+      <app-knowledge-card></app-knowledge-card>
+      <app-simple-value-card
+        cardTitle="Hobbies"
         name="hobbies"
-        @add="add"
-        isSimpleValue
-      >
-        <li
-          class="card-text __record __record_text"
-          v-for="(hobby, idx) in userDetails.hobbies"
-          :key="idx"
-        >
-          <app-record-actions
-            :idx="idx"
-            name="hobby"
-            isSimpleValue
-            @remove="remove"
-            @edit="edit"
-          ></app-record-actions>
-          {{ hobby }}
-        </li>
-      </app-details-card> -->
-
-      <!--  -->
+      ></app-simple-value-card>
     </section>
   </div>
 </template>
 
 <script>
-import format from 'date-fns/format';
 import { mapState } from 'vuex';
 import EditModalVue from './editModal/EditModal.vue';
 import ErrorVue from '../ui/alerts/Error.vue';
 import EducationCardVue from './detailsCards/EducationCard.vue';
 import ExperienceCardVue from './detailsCards/ExperienceCard.vue';
+import KnowledgeCardVue from './detailsCards/KnowledgeCard.vue';
+import SimpleValueCardVue from './detailsCards/SimpleValueCard.vue';
 
 export default {
   name: 'MyProfile',
@@ -131,7 +73,9 @@ export default {
     appEditModal: EditModalVue,
     appError: ErrorVue,
     appEducationCard: EducationCardVue,
-    appExperienceCard: ExperienceCardVue
+    appExperienceCard: ExperienceCardVue,
+    appKnowledgeCard: KnowledgeCardVue,
+    appSimpleValueCard: SimpleValueCardVue
   },
   computed: {
     ...mapState({
@@ -141,15 +85,6 @@ export default {
       loading: (state) => state.auth.fetchingUserDetails,
       error: (state) => state.auth.fetchUserDetailsError
     })
-  },
-  filters: {
-    format: (val) => {
-      if (val instanceof Date) {
-        return format(val, 'yyyy-MM-dd');
-      }
-
-      return val;
-    }
   },
   methods: {
     clearEditing() {

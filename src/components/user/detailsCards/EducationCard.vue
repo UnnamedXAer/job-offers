@@ -1,15 +1,15 @@
 <template >
   <app-details-card card-title="Education" name="education" :list="education">
-    <template v-slot="{ info }">
+    <template v-slot="{ info: { item: edu } }">
       <div>
         <h6>
-          {{ info.item.school }}
+          {{ edu.school }}
         </h6>
         <p style="margin-block-end: 0">
-          {{ info.item.field }}
+          {{ edu.field }}
         </p>
         <small class="text-secondary">
-          {{ info.item.start | format }} - {{ info.item.end | format }}
+          {{ edu.start | format }} - {{ edu.end | format }}
         </small>
       </div>
     </template>
