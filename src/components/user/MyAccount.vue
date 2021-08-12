@@ -54,10 +54,10 @@ export default {
   },
   computed: {
     ...mapState({
-      userDetails: (state) => state.auth.userDetails,
-      editedField: (state) => state.auth.editUserDetails.editedField,
-      loading: (state) => state.auth.fetchingUserDetails,
-      error: (state) => state.auth.fetchUserDetailsError
+      userDetails: (state) => state.user.userDetails,
+      editedField: (state) => state.user.editUserDetails.editedField,
+      loading: (state) => state.user.fetchingUserDetails,
+      error: (state) => state.user.fetchUserDetailsError
     })
   },
   methods: {
@@ -69,7 +69,7 @@ export default {
     }
   },
   created() {
-    if (!this.$store.state.auth.userDetails) {
+    if (!this.$store.state.user.userDetails) {
       this.$store.dispatch('fetchLoggedUserDetails');
     }
   }
@@ -77,5 +77,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

@@ -96,8 +96,8 @@ export default {
 
   computed: {
     ...mapState({
-      loading: (state) => state.auth.editUserDetails.loading,
-      error: (state) => state.auth.editUserDetails.error
+      loading: (state) => state.user.editUserDetails.loading,
+      error: (state) => state.user.editUserDetails.error
     }),
     currentFormComponent() {
       if (!this.editedField) {

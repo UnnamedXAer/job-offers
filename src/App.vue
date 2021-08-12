@@ -5,7 +5,7 @@
       <div class="row"></div>
       <div class="row">
         <keep-alive include="OfferForm">
-          <router-view :user="user" />
+          <router-view />
         </keep-alive>
       </div>
     </div>
@@ -18,16 +18,6 @@ export default {
   name: 'App',
   components: {
     appNavbar: NavbarVue
-  },
-  data() {
-    return {
-      user: {
-        id: 'my-user-id'
-      }
-    };
-  },
-  created() {
-    this.$store.dispatch('authenticate');
   }
 };
 </script>

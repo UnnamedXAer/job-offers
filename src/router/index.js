@@ -8,12 +8,28 @@ import OfferPreviewVue from '@/components/offers/OfferPreview.vue';
 import UserOffersVue from '@/components/offers/user-offers/UserOffers.vue';
 import CurrentOfferVue from '@/components/lookup/offers/CurrentOffer.vue';
 import MyAccountVue from '@/components/user/MyAccount.vue';
+import AuthVue from '@/components/auth/Auth.vue';
+import LoginVue from '@/components/auth/Login.vue';
+import RegistrationVue from '@/components/auth/Registration.vue';
 
 Vue.use(Router);
 
 export default new Router({
   mode: 'history',
   routes: [
+    {
+      path: '/login',
+      name: 'Auth',
+      component: AuthVue,
+      children: [
+        {
+          path: '/registration',
+          name: 'Registration',
+          component: RegistrationVue
+        },
+        { path: '/login', name: 'Login', component: LoginVue }
+      ]
+    },
     {
       path: '/lookup',
       name: 'Lookup',

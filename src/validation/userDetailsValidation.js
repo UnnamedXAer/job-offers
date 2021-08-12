@@ -1,4 +1,5 @@
 import { isAfter, parseISO, startOfToday } from 'date-fns';
+import { validateTextLength } from './common.js';
 import { getError } from './errors.js';
 
 export function validateUserDetailProp(
@@ -79,19 +80,6 @@ function validateKnowledgeProp(prop, fieldName) {
   throw new Error(
     'user details: validate knowledge: unknown property "' + fieldName + '"'
   );
-}
-
-function validateTextLength(val, maxLength) {
-  const valLen = val.trim().length;
-  if (valLen === 0) {
-    return getError('e1000');
-  }
-
-  if (valLen > maxLength) {
-    return getError('e1100', maxLength);
-  }
-
-  return null;
 }
 
 function validateStart(startVal, endVal) {

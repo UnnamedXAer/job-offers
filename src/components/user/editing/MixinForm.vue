@@ -11,9 +11,9 @@ export default {
   },
   computed: {
     ...mapState({
-      form: (state) => state.auth.editUserDetails.form,
-      errors: (state) => state.auth.editUserDetails.errors,
-      touched: (state) => state.auth.editUserDetails.touched
+      form: (state) => state.user.editUserDetails.form,
+      errors: (state) => state.user.editUserDetails.errors,
+      touched: (state) => state.user.editUserDetails.touched
     })
   },
 

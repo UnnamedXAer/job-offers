@@ -27,8 +27,8 @@ export default {
   },
   computed: {
     education() {
-      return this.$store.state.auth.userDetails
-        ? this.$store.state.auth.userDetails.education
+      return this.$store.state.user.userDetails
+        ? this.$store.state.user.userDetails.education
         : null;
     }
   },

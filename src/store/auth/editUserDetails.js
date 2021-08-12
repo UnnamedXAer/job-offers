@@ -107,7 +107,7 @@ export const editUserDetailsStore = {
 
     setUserDetailEditedField({ commit, rootState }, fieldInfo) {
       const { form, formErrors, formTouches } = createFormValues(
-        rootState.auth.userDetails,
+        rootState.user.userDetails,
         fieldInfo
       );
 
@@ -141,7 +141,7 @@ export const editUserDetailsStore = {
       commit('saveUserDetailFormStart');
 
       const payload = prepareUserDetailFormSavePayload(
-        rootState.auth.userDetails[fieldName],
+        rootState.user.userDetails[fieldName],
         state.form,
         state.editedField
       );

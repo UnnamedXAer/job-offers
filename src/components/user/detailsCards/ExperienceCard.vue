@@ -29,8 +29,8 @@ export default {
   },
   computed: {
     experience() {
-      return this.$store.state.auth.userDetails
-        ? this.$store.state.auth.userDetails.experience
+      return this.$store.state.user.userDetails
+        ? this.$store.state.user.userDetails.experience
         : null;
     }
   },

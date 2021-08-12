@@ -26,8 +26,8 @@ export default {
   },
   computed: {
     list() {
-      return this.$store.state.auth.userDetails
-        ? this.$store.state.auth.userDetails[this.name]
+      return this.$store.state.user.userDetails
+        ? this.$store.state.user.userDetails[this.name]
         : null;
     }
   },

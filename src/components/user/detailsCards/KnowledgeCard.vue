@@ -17,8 +17,8 @@ export default {
   },
   computed: {
     knowledge() {
-      return this.$store.state.auth.userDetails
-        ? this.$store.state.auth.userDetails.knowledge
+      return this.$store.state.user.userDetails
+        ? this.$store.state.user.userDetails.knowledge
         : null;
     }
   },
