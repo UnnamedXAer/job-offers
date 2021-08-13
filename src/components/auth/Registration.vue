@@ -5,14 +5,9 @@
   >
     <h1>register me</h1>
 
-    <app-alert v-if="user !== null">
-      The user is alerady logged in. You are not
-      <strong>{{ user.fname + ' ' + user.lname }}</strong
-      >?
-      <a href="#">Logout</a>
-    </app-alert>
+    <app-user-logged-info :username="loggedUserName"></app-user-logged-info>
 
-    <form novalidate @submit.prevent="register">
+    <form novalidate @submit.prevent="authenticate">
       <div class="mb-4 mt-3 position-relative">
         <label for="registration-fname" class="form-label">First Name</label>
         <input
@@ -110,9 +105,9 @@
         </app-field-error>
       </div>
 
-      <app-alert level="danger" class="mt-4" v-if="error !== null">{{
-        error
-      }}</app-alert>
+      <app-alert level="danger" class="mt-4" v-if="error !== null">
+        {{ error }}
+      </app-alert>
 
       <div class="mb-3 px-sm-5" :class="{ 'mt-5': error === null }">
         <button
@@ -120,7 +115,7 @@
           :class="{ disabled: loading }"
           :disabled="loading"
           type="submit"
-          @click="register"
+          @click="authenticate"
         >
           <span
             class="spinner-border spinner-border-sm"
@@ -136,87 +131,14 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
-import { validateRegistrationFormProp } from '../../validation/authValidation';
-import AlertVue from '../ui/alerts/Alert.vue';
-import ErrorVue from '../ui/alerts/Error.vue';
-import FieldErrorVue from '../user/editing/FieldError.vue';
+import AuthFormMixinVue from './AuthFormMixin.vue';
 
 export default {
-  components: {
-    appFieldError: FieldErrorVue,
-    appError: ErrorVue,
-    appAlert: AlertVue
-  },
+  mixins: [AuthFormMixinVue],
   data() {
     return {
-      form: {
-        emailAddress: '',
-        password: '',
-        lname: '',
-        fname: '',
-        dob: ''
-      },
-      errors: {
-        emailAddress: null,
-        password: null,
-        lname: null,
-        fname: null,
-        dob: null
-      },
-      touched: {
-        emailAddress: false,
-        password: false,
-        lname: false,
-        fname: false,
-        dob: false
-      }
+      isRegistration: true
     };
-  },
-
-  computed: mapState({
-    user: (state) => state.auth.user,
-    loading: (state) => state.auth.loading,
-    error: (state) => state.auth.error
-  }),
-
-  methods: {
-    changeHandler(fieldName, value) {
-      this.form[fieldName] = value;
-      this.touched[fieldName] = true;
-      this.errors[fieldName] = validateRegistrationFormProp(fieldName, value);
-    },
-    async register() {
-      this.validateAll();
-
-      for (const fieldName in this.errors) {
-        if (this.errors[fieldName] !== null) {
-          this.$store.commit('authFail', 'Form has errors.');
-          return;
-        }
-      }
-
-      const success = await this.$store.dispatch('authenticate', {
-        form: { ...this.form },
-        isRegistration: true
-      });
-      if (success) {
-        this.$router.push('/');
-      }
-    },
-    validateAll() {
-      for (const fieldName in this.form) {
-        this.errors[fieldName] = validateRegistrationFormProp(
-          fieldName,
-          this.form[fieldName]
-        );
-        this.touched[fieldName] = true;
-      }
-    }
-  },
-
-  mounted() {
-    this.$refs.firstElement.focus();
   }
 };
 </script>

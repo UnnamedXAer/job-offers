@@ -40,9 +40,13 @@
           >My Offers</router-link
         >
         <hr class="dropdown-divider" />
-        <button class="dropdown-item" @click.stop="toggleUserMenu">
+        <router-link
+          class="dropdown-item"
+          @click.native.stop="toggleUserMenu"
+          :to="{ name: 'Logout' }"
+        >
           Logout
-        </button>
+        </router-link>
       </div>
     </transition>
   </div>

@@ -27,7 +27,20 @@ export default new Router({
           name: 'Registration',
           component: RegistrationVue
         },
-        { path: '/login', name: 'Login', component: LoginVue }
+        { path: '/login', name: 'Login', component: LoginVue },
+        {
+          path: '/logout',
+          name: 'Logout',
+          component: {
+            render(createFn) {
+              return createFn('h1', 'done');
+            },
+            created() {
+              console.log('logout component here');
+              this.$store.dispatch('logout');
+            }
+          }
+        }
       ]
     },
     {

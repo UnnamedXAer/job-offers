@@ -68,24 +68,28 @@ function mapUserPropWithStartEndDate(record) {
 export const mapUserExperienceProp = mapUserPropWithStartEndDate;
 export const mapUserEducationProp = mapUserPropWithStartEndDate;
 
-export function mapApiDataToUser(data) {
+export function mapApiDataToUser({ user: userData }) {
+  if (!userData) {
+    throw new Error('Internal error.');
+  }
+
   return {
-    id: data.user.id,
-    fname: data.user.firstName,
-    lname: data.user.lastName,
-    dob: data.user.dob ? new Date(data.user.dob) : null,
-    location: data.user.location
+    id: userData.id,
+    fname: userData.firstName,
+    lname: userData.lastName,
+    dob: userData.dob ? new Date(userData.dob) : null,
+    location: userData.location
       ? {
-          name: data.user.location.name,
-          coords: data.user.location.coords
+          name: userData.location.name,
+          coords: userData.location.coords
             ? {
-                lat: data.user.location.coords.lat,
-                lng: data.user.location.coords.lng
+                lat: userData.location.coords.lat,
+                lng: userData.location.coords.lng
               }
             : null
         }
       : null,
-    avatarUrl: data.user.avatarUrl
+    avatarUrl: userData.avatarUrl
   };
 }
 

@@ -30,22 +30,26 @@ export const authStore = {
       state.error = errMsg;
       state.loading = false;
       state.user = null;
+    },
+    logout(state) {
+      state.user = null;
     }
   },
 
   actions: {
     async authenticate({ commit }, { form, isRegistration }) {
-      const payload = form;
-
       commit('authStart');
       try {
-        const user = await authenticate(payload, isRegistration);
+        const user = await authenticate(form, isRegistration);
         commit('authSuccess', user);
         return true;
       } catch (err) {
         commit('authFail', err.message);
       }
       return false;
+    },
+    logout({ commit }) {
+      commit('logout');
     }
   }
 };
