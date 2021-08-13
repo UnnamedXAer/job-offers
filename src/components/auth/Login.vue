@@ -17,7 +17,7 @@
         <label for="login-emailAddress" class="form-label">Email Address</label>
         <input
           id="login-emailAddress"
-          class="form-control"
+          class="form-control form-control-lg"
           :class="[
             errors.emailAddress
               ? 'is-invalid'
@@ -40,7 +40,7 @@
         <label for="login-password" class="form-label">Password</label>
         <input
           id="login-password"
-          class="form-control"
+          class="form-control form-control-lg"
           :class="[
             errors.password ? 'is-invalid' : touched.password ? 'is-valid' : ''
           ]"
@@ -82,7 +82,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import { login } from '../../validation/authValidation';
+import { validateLoginFormProp } from '../../validation/authValidation';
 import AlertVue from '../ui/alerts/Alert.vue';
 import ErrorVue from '../ui/alerts/Error.vue';
 import FieldErrorVue from '../user/editing/FieldError.vue';
@@ -120,24 +120,31 @@ export default {
     changeHandler(fieldName, value) {
       this.form[fieldName] = value;
       this.touched[fieldName] = true;
-      this.errors[fieldName] = login(fieldName, value);
+      this.errors[fieldName] = validateLoginFormProp(fieldName, value);
     },
-    login() {
+    async login() {
       this.validateAll();
 
       for (const fieldName in this.errors) {
         if (this.errors[fieldName] !== null) {
-          //   this.error = 'Form has errors.';
-          this.$store.commit('loginFail', 'Form has errors.');
+          this.$store.commit('authFail', 'Form has errors.');
           return;
         }
       }
 
-      this.$store.dispatch('login', { ...this.form });
+      const success = await this.$store.dispatch('authenticate', {
+        ...this.form
+      });
+      if (success) {
+        this.$router.push('/');
+      }
     },
     validateAll() {
       for (const fieldName in this.form) {
-        this.errors[fieldName] = login(fieldName, this.form[fieldName]);
+        this.errors[fieldName] = validateLoginFormProp(
+          fieldName,
+          this.form[fieldName]
+        );
         this.touched[fieldName] = true;
       }
     }
@@ -148,6 +155,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-</style>

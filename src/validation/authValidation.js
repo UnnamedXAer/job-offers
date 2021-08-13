@@ -2,7 +2,7 @@ import { isAfter, isBefore, isDate, parseISO, startOfDay } from 'date-fns';
 import { validateTextLength } from './common';
 import { getError } from './errors';
 
-export const login = (fieldName, val) => {
+export const validateLoginFormProp = (fieldName, val) => {
   switch (fieldName) {
     case 'emailAddress':
       return emailAddress(val);
@@ -13,17 +13,23 @@ export const login = (fieldName, val) => {
   throw new Error('login: validation: unknown field: "' + fieldName + '"');
 };
 
-export const registration = (fieldName, val) => {
+export const validateRegistrationFormProp = (fieldName, val) => {
   switch (fieldName) {
     case 'emailAddress':
       return emailAddress(val);
     case 'password':
       return password(val);
-    case 'DOB':
-      return DOB(val);
+    case 'dob':
+      return dob(val);
+    case 'lname':
+      return lastName(val);
+    case 'fname':
+      return firstName(val);
   }
 
-  throw new Error('login: validation: unknown field: "' + fieldName + '"');
+  throw new Error(
+    'registration: validation: unknown field: "' + fieldName + '"'
+  );
 };
 
 export const emailAddress = val => {
@@ -68,21 +74,21 @@ export const password = val => {
 export const firstName = val => validateTextLength(val, 50);
 export const lastName = val => validateTextLength(val, 50);
 
-export const DOB = val => {
+export const dob = val => {
   if (val.trim().length === 0) {
     return null;
   }
 
   const date = parseISO(val);
 
-  if (!isDate(date.getTime())) {
-    return getError('1501', ['Date']);
+  if (!isDate(date)) {
+    return getError('e1501', ['Date']);
   }
 
-  if (isBefore(startOfDay(new Date(1900, 0, 1)), date)) {
-    return getError('1501', ['Date']);
+  if (isBefore(date, startOfDay(new Date(1900, 0, 1)))) {
+    return getError('e1501', ['Date']);
   }
-  if (isAfter(startOfDay(new Date()), date)) {
+  if (isAfter(date, startOfDay(new Date()))) {
     return getError('e1205', ['date', 'today']);
   }
 

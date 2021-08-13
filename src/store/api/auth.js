@@ -1,52 +1,15 @@
-/* eslint-disable indent */
 import axios from 'axios';
+import { mapApiDataToUser, mapUserToApiData } from '../../helpers/api';
+import { errorHandler } from './errorhandler';
 
-export async function login(payload) {
-  const url = 'http://localhost:3998/home/login';
+export async function authenticate(newUser, isRegistration) {
+  const url =
+    'http://localhost:3998/home/' + (isRegistration ? 'registration' : 'login');
+  const payload = mapUserToApiData(newUser);
   try {
     const { data } = await axios.post(url, payload);
-    return {
-      id: data.user.id,
-      fname: data.user.firstName,
-      lname: data.user.lastName,
-      location: data.user.location
-        ? {
-            name: data.user.location.name,
-            coords: {
-              lat: data.user.location.coords.lat,
-              lng: data.user.location.coords.lng
-            }
-          }
-        : null,
-      avatarUrl: data.user.avatarUrl
-    };
+    return mapApiDataToUser(data);
   } catch (err) {
-    console.log('auth: login:', err);
-    throw err;
-  }
-}
-
-export async function registration(payload) {
-  const url = 'http://localhost:3998/home/registration';
-  try {
-    const { data } = await axios.post(url, payload);
-    return {
-      id: data.user.id,
-      fname: data.user.firstName,
-      lname: data.user.lastName,
-      location: data.user.location
-        ? {
-            name: data.user.location.name,
-            coords: {
-              lat: data.user.location.coords.lat,
-              lng: data.user.location.coords.lng
-            }
-          }
-        : null,
-      avatarUrl: data.user.avatarUrl
-    };
-  } catch (err) {
-    console.log('auth: registration:', err);
-    throw err;
+    errorHandler(err, 'auth: ' + (isRegistration ? 'registration:' : 'login:'));
   }
 }

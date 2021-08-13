@@ -1,5 +1,5 @@
 import { editUserDetailsStore } from './editUserDetails';
-import { login } from '../api/auth';
+import { authenticate } from '../api/auth';
 
 export const getDefaultState = () => ({
   user: null,
@@ -17,16 +17,16 @@ export const authStore = {
   state: getDefaultState,
 
   mutations: {
-    loginStart(state) {
+    authStart(state) {
       state.error = null;
       state.loading = true;
     },
-    loginSuccess(state, user) {
+    authSuccess(state, user) {
       state.error = null;
       state.loading = false;
       state.user = user;
     },
-    loginFail(state, errMsg) {
+    authFail(state, errMsg) {
       state.error = errMsg;
       state.loading = false;
       state.user = null;
@@ -34,16 +34,18 @@ export const authStore = {
   },
 
   actions: {
-    async login({ commit }, form) {
+    async authenticate({ commit }, { form, isRegistration }) {
       const payload = form;
 
-      commit('loginStart');
+      commit('authStart');
       try {
-        const user = await login(payload);
-        commit('loginSuccess', user);
+        const user = await authenticate(payload, isRegistration);
+        commit('authSuccess', user);
+        return true;
       } catch (err) {
-        commit('loginFail', err.message);
+        commit('authFail', err.message);
       }
+      return false;
     }
   }
 };
