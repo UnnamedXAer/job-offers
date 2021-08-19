@@ -55,7 +55,8 @@ export default {
       const success = await this.$store.dispatch('authenticate', {
         form: {
           ...this.form
-        }
+        },
+        isRegistration: !!this.isRegistration
       });
       if (success) {
         this.$router.push('/');
