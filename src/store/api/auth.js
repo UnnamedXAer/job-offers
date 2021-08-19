@@ -8,8 +8,16 @@ export async function authenticate(form, isRegistration) {
   const payload = isRegistration ? mapUserToApiData(form) : form;
   try {
     const { data } = await axios.post(url, payload);
-    return mapApiDataToUser(data);
+    const user = mapApiDataToUser(data.user);
+    return {
+      user,
+      token: data.token
+    };
   } catch (err) {
     errorHandler(err, 'auth: ' + (isRegistration ? 'registration:' : 'login:'));
   }
+}
+
+export async function fetchLoggedUser() {
+  return {};
 }
