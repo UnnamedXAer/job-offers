@@ -51,7 +51,7 @@ export const userStore = {
       commit('fetchLoggedUserDetailsStart');
       try {
         const { data } = await axios.get(
-          'http://localhost:3998/home/user/' + rootState.user.id
+          'http://localhost:3998/home/users/' + rootState.user.id + '/details'
         );
         const { userData } = data;
         const userDetails = {

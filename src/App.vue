@@ -18,6 +18,9 @@ export default {
   name: 'App',
   components: {
     appNavbar: NavbarVue
+  },
+  created() {
+    this.$store.dispatch('tryAutologin');
   }
 };
 </script>
