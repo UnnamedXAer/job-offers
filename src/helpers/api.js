@@ -68,7 +68,7 @@ function mapUserPropWithStartEndDate(record) {
 export const mapUserExperienceProp = mapUserPropWithStartEndDate;
 export const mapUserEducationProp = mapUserPropWithStartEndDate;
 
-export function mapApiDataToUser({ user: userData }) {
+export function mapApiDataToUser(userData) {
   if (!userData) {
     throw new Error('Internal error.');
   }
